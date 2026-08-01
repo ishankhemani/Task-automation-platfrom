@@ -2,6 +2,9 @@ import { TasksRepository } from './tasks.repository.js';
 import { CreateTaskDTO, UpdateTaskDTO, TasksListQueryDTO } from './tasks.dto.js';
 import { TaskStatus, Role } from '@prisma/client';
 import { ForbiddenError, NotFoundError, BadRequestError } from '../../errors/index.js';
+import { queues } from '../../queues/queueManager.js';
+import { QUEUES } from '@task-platform/shared';
+import { logger } from '../../utils/index.js';
 
 export class TasksService {
   private repository: TasksRepository;
@@ -42,6 +45,17 @@ export class TasksService {
       this.repository.createHistory(task.id, null, TaskStatus.PENDING, user.id, 'Task created'),
       this.repository.createLog(task.id, 'info', `Task "${task.title}" created successfully`, { createdBy: user.id }),
     ]);
+
+    // Dispatch job to BullMQ Queue for asynchronous processing
+    if (queues[QUEUES.DEFAULT]) {
+      await queues[QUEUES.DEFAULT]
+        .add('task:execute', {
+          taskId: task.id,
+          title: task.title,
+          payload: { description: task.description, priority: task.priority },
+        })
+        .catch((err) => logger.error({ error: err.message }, 'Failed to enqueue task job to BullMQ'));
+    }
 
     return task;
   }

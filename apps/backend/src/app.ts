@@ -15,6 +15,8 @@ import authRoutes from './modules/auth/auth.route.js';
 import tasksRoutes from './modules/tasks/tasks.route.js';
 import dashboardRoutes from './modules/dashboard/dashboard.route.js';
 import analyticsRoutes from './modules/analytics/analytics.route.js';
+import queueRoutes from './modules/queue/queue.route.js';
+import notificationRoutes from './modules/notifications/notifications.route.js';
 
 const app = express();
 
@@ -59,6 +61,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', tasksRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/queues', queueRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // Base route
 app.get('/api/v1/health', (req, res) => {
