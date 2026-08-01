@@ -1,6 +1,17 @@
-import { QueueRepository } from './queue.repository.js';
-import { logger } from '../../utils/index.js';
+import { getAllQueueStats } from '../../queues/queueManager.js';
+import { workers } from '../../workers/index.js';
 
 export class QueueService {
-  // TODO: Implement service methods in future parts
+  async getQueueStats() {
+    return getAllQueueStats();
+  }
+
+  async getWorkerStats() {
+    return workers.map((w, idx) => ({
+      id: `worker-node-${idx + 1}`,
+      name: w.name,
+      status: w.isRunning() ? 'ONLINE' : 'OFFLINE',
+      concurrency: w.opts.concurrency,
+    }));
+  }
 }
