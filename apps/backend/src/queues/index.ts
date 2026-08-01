@@ -1,2 +1,2 @@
-// BullMQ queues & worker pool setup placeholder
-export {};
+export * from './redis.js';
+export * from './queueManager.js';

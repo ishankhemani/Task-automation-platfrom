@@ -1,0 +1,2 @@
+// Analytics module types
+// TODO: Define types in future parts

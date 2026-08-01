@@ -11,108 +11,222 @@ datasource db {
 
 enum Role {
   ADMIN
-  OPERATOR
+  USER
   VIEWER
 }
 
 enum TaskStatus {
   PENDING
-  ACTIVE
+  PROCESSING
   COMPLETED
   FAILED
   CANCELLED
-  DELAYED
 }
 
 enum Priority {
   LOW
-  NORMAL
+  MEDIUM
   HIGH
   CRITICAL
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String
-  role      Role     @default(OPERATOR)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum QueueStatus {
+  ACTIVE
+  PAUSED
+}
 
-  tasks     Task[]
-  workflows Workflow[]
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  TASK_UPDATE
+  SYSTEM
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  password      String
+  role          Role      @default(USER)
+  avatar        String?
+  isVerified    Boolean   @default(false)
+  status        String    @default("ACTIVE")
+  lastLogin     DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  tasks         Task[]          @relation("UserTasks")
+  assignedTasks Task[]          @relation("AssignedTasks")
+  refreshTokens RefreshToken[]
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+  uploads       Upload[]
 
   @@map("users")
 }
 
+model RefreshToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  isRevoked   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
 model Task {
-  id          String     @id @default(uuid())
-  name        String
-  type        String
-  payload     Json       @default("{}")
-  status      TaskStatus @default(PENDING)
-  priority    Priority   @default(NORMAL)
-  progress    Int        @default(0)
-  result      Json?
-  error       String?
-  scheduledAt DateTime?
-  startedAt   DateTime?
-  completedAt DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  priority      Priority  @default(MEDIUM)
+  status        TaskStatus @default(PENDING)
+  scheduledTime DateTime?
+  retryCount    Int       @default(0)
+  queueId       String?
+  attachment    String?
+  
+  createdBy     String
+  author        User      @relation("UserTasks", fields: [createdBy], references: [id])
+  
+  assignedTo    String?
+  assignee      User?     @relation("AssignedTasks", fields: [assignedTo], references: [id])
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
 
-  userId      String?
-  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  workflowId  String?
-  workflow    Workflow?   @relation(fields: [workflowId], references: [id], onDelete: SetNull)
-
-  logs        JobLog[]
+  history       TaskHistory[]
+  logs          TaskLog[]
+  notifications Notification[]
+  queueJobs     QueueJob[]
 
   @@index([status])
-  @@index([type])
+  @@index([priority])
+  @@index([createdAt])
   @@map("tasks")
 }
 
-model Workflow {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  definition  Json
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  tasks       Task[]
-
-  @@map("workflows")
-}
-
-model JobLog {
-  id        String   @id @default(uuid())
-  taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  level     String   @default("info")
-  message   String
-  metadata  Json?
-  timestamp DateTime @default(now())
+model TaskHistory {
+  id          String    @id @default(uuid())
+  taskId      String
+  task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  oldStatus   TaskStatus?
+  newStatus   TaskStatus
+  changedBy   String?
+  notes       String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   @@index([taskId])
-  @@map("job_logs")
+  @@map("task_history")
 }
 
-model WorkerNode {
-  id        String   @id @default(uuid())
-  hostname  String
-  ipAddress String
-  status    String   @default("ACTIVE")
-  activeJobs Int     @default(0)
-  lastPing  DateTime @default(now())
-  createdAt DateTime @default(now())
+model TaskLog {
+  id          String    @id @default(uuid())
+  taskId      String
+  task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  level       String    @default("info")
+  message     String
+  metadata    Json?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
-  @@map("worker_nodes")
+  @@index([taskId])
+  @@map("task_logs")
+}
+
+model QueueJob {
+  id            String    @id @default(uuid())
+  jobId         String    @unique
+  taskId        String?
+  task          Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  worker        String?
+  attempts      Int       @default(0)
+  currentStatus String
+  failedReason  String?
+  
+  startedAt     DateTime?
+  completedAt   DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  @@index([currentStatus])
+  @@index([taskId])
+  @@map("queue_jobs")
+}
+
+model Notification {
+  id          String            @id @default(uuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId      String?
+  task        Task?             @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  title       String
+  message     String
+  isRead      Boolean           @default(false)
+  type        NotificationType  @default(INFO)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model Upload {
+  id          String    @id @default(uuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  path        String
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId])
+  @@map("uploads")
+}
+
+model ActivityLog {
+  id          String    @id @default(uuid())
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  entity      String?
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId])
+  @@index([action])
+  @@map("activity_logs")
 }

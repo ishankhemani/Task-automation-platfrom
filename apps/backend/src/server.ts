@@ -1,26 +1,41 @@
-import http from 'http';
-import { Server } from 'socket.io';
-import { app } from './app.js';
+import app from './app.js';
 import { config } from './config/index.js';
+import { connectDB } from './database/index.js';
 import { logger } from './utils/index.js';
+import { initializeQueues } from './queues/index.js';
 
-const server = http.createServer(app);
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { initializeSocketServer } from './sockets/index.js';
+import { setupWorker } from './workers/index.js';
 
-export const io = new Server(server, {
+const server = createServer(app);
+
+const io = new Server(server, {
   cors: {
     origin: config.cors.origin,
     credentials: true,
   },
 });
 
-io.on('connection', (socket) => {
-  logger.info(`Client connected: ${socket.id}`);
+initializeSocketServer(io);
 
-  socket.on('disconnect', () => {
-    logger.info(`Client disconnected: ${socket.id}`);
-  });
-});
+export { io };
 
-server.listen(config.port, config.host, () => {
-  logger.info(`Server running on http://${config.host}:${config.port}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    initializeQueues();
+    setupWorker();
+
+    server.listen(config.port, () => {
+      logger.info(`🚀 Server running in ${config.env} mode on port ${config.port}`);
+      logger.info(`📚 Swagger docs available at http://localhost:${config.port}/api/docs`);
+    });
+  } catch (error) {
+    logger.error({ error }, 'Failed to start server:');
+    process.exit(1);
+  }
+};
+
+startServer();

@@ -1,12 +1,10 @@
-import { useEffect } from 'react';
-import { socket } from '../lib/socket.js';
+import { useContext } from 'react';
+import { SocketContext } from '../providers/SocketProvider.js';
 
-export function useSocket(event: string, callback: (data: unknown) => void) {
-  useEffect(() => {
-    socket.on(event, callback);
-
-    return () => {
-      socket.off(event, callback);
-    };
-  }, [event, callback]);
+export function useSocket() {
+  const context = useContext(SocketContext);
+  if (!context) {
+    throw new Error('useSocket must be used within a SocketProvider');
+  }
+  return context;
 }

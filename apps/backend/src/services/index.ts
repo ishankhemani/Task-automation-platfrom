@@ -1,2 +1,1 @@
-// Service layer entrypoint placeholder
-export {};
+export * from './prisma.js';

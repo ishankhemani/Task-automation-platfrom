@@ -2,11 +2,10 @@
 
 export enum TaskStatus {
   PENDING = 'PENDING',
-  ACTIVE = 'ACTIVE',
+  PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   CANCELLED = 'CANCELLED',
-  DELAYED = 'DELAYED',
 }
 
 export enum JobPriority {
@@ -18,6 +17,27 @@ export enum JobPriority {
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  OPERATOR = 'OPERATOR',
+  USER = 'USER',
   VIEWER = 'VIEWER',
 }
+
+export enum WorkflowStatus {
+  DRAFT = 'DRAFT',
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  ARCHIVED = 'ARCHIVED',
+}
+
+export enum WorkerStatus {
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  BUSY = 'BUSY',
+  IDLE = 'IDLE',
+  MAINTENANCE = 'MAINTENANCE',
+}
+
+export enum QueueStatus {
+  ACTIVE = 'ACTIVE',
+  PAUSED = 'PAUSED',
+}
+

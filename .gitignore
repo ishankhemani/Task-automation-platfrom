@@ -22,8 +22,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Database & Prisma
-prisma/migrations/
+# Database
 *.db
 *.sqlite
 
