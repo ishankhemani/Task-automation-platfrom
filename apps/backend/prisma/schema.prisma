@@ -1,0 +1,118 @@
+// Prisma Schema Definition for Task Automation & Job Processing Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum TaskStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+  FAILED
+  CANCELLED
+  DELAYED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(OPERATOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks     Task[]
+  workflows Workflow[]
+
+  @@map("users")
+}
+
+model Task {
+  id          String     @id @default(uuid())
+  name        String
+  type        String
+  payload     Json       @default("{}")
+  status      TaskStatus @default(PENDING)
+  priority    Priority   @default(NORMAL)
+  progress    Int        @default(0)
+  result      Json?
+  error       String?
+  scheduledAt DateTime?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  workflowId  String?
+  workflow    Workflow?   @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+
+  logs        JobLog[]
+
+  @@index([status])
+  @@index([type])
+  @@map("tasks")
+}
+
+model Workflow {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  definition  Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  tasks       Task[]
+
+  @@map("workflows")
+}
+
+model JobLog {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  level     String   @default("info")
+  message   String
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  @@index([taskId])
+  @@map("job_logs")
+}
+
+model WorkerNode {
+  id        String   @id @default(uuid())
+  hostname  String
+  ipAddress String
+  status    String   @default("ACTIVE")
+  activeJobs Int     @default(0)
+  lastPing  DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@map("worker_nodes")
+}

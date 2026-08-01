@@ -1,0 +1,44 @@
+# Multi-stage Dockerfile for Node.js Backend & BullMQ Worker
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy root workspace configs
+COPY package*.json tsconfig.base.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY apps/backend/package*.json ./apps/backend/
+COPY apps/backend/prisma ./apps/backend/prisma/
+
+# Install dependencies
+RUN npm ci
+
+# Copy source files
+COPY packages/shared ./packages/shared
+COPY apps/backend ./apps/backend
+
+# Generate Prisma Client & Build
+RUN npm run prisma:generate
+RUN npm run build:shared
+RUN npm run build:backend
+
+# Production Runner Stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY package*.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY apps/backend/package*.json ./apps/backend/
+
+RUN npm ci --only=production
+
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+EXPOSE 4000
+
+CMD ["node", "apps/backend/dist/server.js"]
