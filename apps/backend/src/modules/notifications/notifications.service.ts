@@ -1,6 +1,21 @@
 import { NotificationsRepository } from './notifications.repository.js';
-import { logger } from '../../utils/index.js';
 
 export class NotificationsService {
-  // TODO: Implement service methods in future parts
+  private repository: NotificationsRepository;
+
+  constructor() {
+    this.repository = new NotificationsRepository();
+  }
+
+  async getUserNotifications(userId: string) {
+    return this.repository.findUserNotifications(userId);
+  }
+
+  async markAsRead(id: string, userId: string) {
+    return this.repository.markAsRead(id, userId);
+  }
+
+  async markAllAsRead(userId: string) {
+    return this.repository.markAllAsRead(userId);
+  }
 }

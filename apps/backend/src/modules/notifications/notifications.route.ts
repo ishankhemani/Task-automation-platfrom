@@ -1,7 +1,13 @@
 import { Router } from 'express';
+import { NotificationsController } from './notifications.controller.js';
+import { authenticate } from '../../middleware/auth.js';
+import { asyncHandler } from '../../utils/index.js';
 
 const router = Router();
 
-// TODO: Add routes in future parts
+router.use(authenticate);
+router.get('/', asyncHandler(NotificationsController.getNotifications));
+router.patch('/:id/read', asyncHandler(NotificationsController.markAsRead));
+router.post('/read-all', asyncHandler(NotificationsController.markAllAsRead));
 
 export default router;
