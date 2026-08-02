@@ -9,7 +9,7 @@ COPY packages/shared/package*.json ./packages/shared/
 COPY apps/backend/package*.json ./apps/backend/
 COPY apps/backend/prisma ./apps/backend/prisma/
 
-# Install dependencies
+# Install dependencies (requires devDeps for building)
 RUN npm ci
 
 # Copy source files
@@ -27,18 +27,31 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY package*.json ./
-COPY packages/shared/package*.json ./packages/shared/
-COPY apps/backend/package*.json ./apps/backend/
+# Install curl for healthchecks
+RUN apk add --no-cache curl
 
-RUN npm ci --only=production
+# Use non-root user
+RUN chown -R node:node /app
+USER node
 
-COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
-COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
-COPY --from=builder /app/apps/backend/prisma ./apps/backend/prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+# Copy configs
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node packages/shared/package*.json ./packages/shared/
+COPY --chown=node:node apps/backend/package*.json ./apps/backend/
+
+# Install production dependencies only
+RUN npm ci --omit=dev --ignore-scripts
+
+# Copy built assets
+COPY --from=builder --chown=node:node /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder --chown=node:node /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder --chown=node:node /app/apps/backend/prisma ./apps/backend/prisma
+COPY --from=builder --chown=node:node /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
 
 EXPOSE 4000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:4000/api/v1/health/live || exit 1
 
 CMD ["node", "apps/backend/dist/server.js"]
