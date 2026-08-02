@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQueueQueries } from '../hooks/useQueueQueries.js';
 import { PageHeader } from '../../../components/data-display/PageHeader.js';
 import { StatCard } from '../../../components/data-display/StatCard.js';
@@ -8,6 +7,7 @@ import { StatusBadge } from '../../../components/common/StatusBadge.js';
 import { Layers, Activity, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/button.js';
 import { showSuccess } from '../../../lib/toast.js';
+import { IQueueStats } from '@task-platform/shared';
 
 export function QueuesPage() {
   const { queueStats, isQueueLoading, refetchQueues, workerStats, isWorkerLoading } = useQueueQueries();
@@ -22,31 +22,31 @@ export function QueuesPage() {
     {
       header: 'Waiting',
       accessorKey: (row: unknown) => (
-        <span className="font-semibold text-amber-500">{(row as any).waiting}</span>
+        <span className="font-semibold text-amber-500">{(row as IQueueStats).waiting}</span>
       ),
     },
     {
       header: 'Active',
       accessorKey: (row: unknown) => (
-        <span className="font-semibold text-blue-500 animate-pulse">{(row as any).active}</span>
+        <span className="font-semibold text-blue-500 animate-pulse">{(row as IQueueStats).active}</span>
       ),
     },
     {
       header: 'Completed',
       accessorKey: (row: unknown) => (
-        <span className="font-semibold text-emerald-500">{(row as any).completed}</span>
+        <span className="font-semibold text-emerald-500">{(row as IQueueStats).completed}</span>
       ),
     },
     {
       header: 'Failed',
       accessorKey: (row: unknown) => (
-        <span className="font-semibold text-rose-500">{(row as any).failed}</span>
+        <span className="font-semibold text-rose-500">{(row as IQueueStats).failed}</span>
       ),
     },
     {
       header: 'Status',
       accessorKey: (row: unknown) => (
-        <StatusBadge status={(row as any).paused ? 'PAUSED' : 'ACTIVE'} />
+        <StatusBadge status={(row as IQueueStats).paused ? 'PAUSED' : 'ACTIVE'} />
       ),
     },
   ];

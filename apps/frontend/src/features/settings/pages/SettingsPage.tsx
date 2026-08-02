@@ -15,7 +15,9 @@ function loadPrefs(): UserPrefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (raw) return JSON.parse(raw) as UserPrefs;
-  } catch {}
+  } catch {
+    // Fall back to default preferences if localStorage reading fails
+  }
   return { notificationsEnabled: true, soundEnabled: true, autoRefresh: true };
 }
 
