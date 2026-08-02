@@ -7,21 +7,37 @@
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Tech Stack](#tech-stack)
-3. [Architecture Diagram](#architecture-diagram)
-4. [Folder Structure](#folder-structure)
-5. [Installation & Setup](#installation--setup)
-6. [Environment Variables](#environment-variables)
-7. [API Documentation](#api-documentation)
-8. [Assumptions](#assumptions)
-9. [Trade-offs](#trade-offs)
-10. [Future Improvements](#future-improvements)
+2. [Video Walkthrough](#video-walkthrough)
+3. [Tech Stack](#tech-stack)
+4. [Architecture Diagram](#architecture-diagram)
+5. [Folder Structure](#folder-structure)
+6. [Installation & Setup](#installation--setup)
+7. [Environment Variables](#environment-variables)
+8. [API Documentation](#api-documentation)
+9. [Assumptions](#assumptions)
+10. [Trade-offs](#trade-offs)
+11. [Future Improvements](#future-improvements)
 
 ---
 
 ## Project Overview
 
-The **Task Automation & Job Processing Platform** is a full-stack, real-time enterprise dashboard that enables teams to:
+The **Task Automation & Job Processing Platform** is a full-stack, real-time enterprise dashboard built for **Saarthi AI Technical Assessment Challenge** that enables teams to:
+
+---
+
+## Video Walkthrough
+
+> 📽️ **Screen Recording (5–10 minutes)**: [Insert Your Loom / Google Drive Public Link Here]
+>
+> The video walkthrough covers:
+> 1. **Overall System Architecture & Data Flow**
+> 2. **Monorepo Folder Structure & Clean Code Practices**
+> 3. **Authentication & Refresh Token Flow**
+> 4. **BullMQ Queue Processing & Redis Caching**
+> 5. **PostgreSQL Database Schema & Prisma Relationships**
+> 6. **Real-time WebSockets / Socket.IO Status Updates**
+> 7. **Key Engineering Decisions & Future Improvements**
 
 - **Create & Schedule Tasks** — define job payloads with priority levels (LOW / MEDIUM / HIGH / CRITICAL) and optional delayed scheduling
 - **Process Jobs Asynchronously** — BullMQ dispatches jobs to Redis-backed worker pools with concurrency control, automatic retries, and exponential backoff
