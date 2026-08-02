@@ -120,8 +120,8 @@ export function Sidebar() {
         )}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-          <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-            TaskAutomation
+          <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent flex items-center gap-1.5">
+            TaskAutomation <span className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20 shrink-0">Enterprise</span>
           </span>
           <button
             onClick={() => dispatch(closeMobileSidebar())}

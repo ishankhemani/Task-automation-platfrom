@@ -16,7 +16,7 @@ export function StatCard({ title, value, change, trend, icon, description }: Sta
   return (
     <motion.div
       {...hoverLiftProps}
-      className="p-4 sm:p-6 rounded-2xl border border-border bg-card/80 backdrop-blur-md shadow-sm hover:shadow-md transition-all group relative overflow-hidden w-full"
+      className="p-3.5 sm:p-5 md:p-6 rounded-2xl border border-border bg-card/80 backdrop-blur-md shadow-sm hover:shadow-md transition-all group relative overflow-hidden w-full min-w-0"
     >
       {/* Background Accent Glow */}
       <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors" />

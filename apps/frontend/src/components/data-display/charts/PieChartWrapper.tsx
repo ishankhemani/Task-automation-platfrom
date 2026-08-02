@@ -18,7 +18,7 @@ export function PieChartWrapper({ data, height = 260, colors = DEFAULT_COLORS }:
   }
 
   return (
-    <div className="w-full" style={{ height }}>
+    <div className="w-full min-w-0 overflow-hidden" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie data={data} cx="50%" cy="45%" innerRadius={40} outerRadius={70} paddingAngle={4} dataKey="value">

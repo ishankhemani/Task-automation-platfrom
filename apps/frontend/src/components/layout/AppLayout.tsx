@@ -15,13 +15,15 @@ export function AppLayout() {
         <Sidebar />
         <main
           className={cn(
-            'flex-1 p-3 sm:p-4 md:p-6 lg:p-8 transition-all duration-300 min-h-[calc(100vh-4rem)] max-w-full overflow-x-hidden',
+            'flex-1 w-full min-w-0 p-3 sm:p-4 md:p-6 lg:p-8 transition-all duration-300 min-h-[calc(100vh-4rem)] max-w-full overflow-x-hidden',
             sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
           )}
         >
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
+          <div className="w-full min-w-0 max-w-7xl mx-auto">
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
+          </div>
         </main>
       </div>
     </div>

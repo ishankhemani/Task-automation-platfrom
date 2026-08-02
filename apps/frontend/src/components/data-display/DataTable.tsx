@@ -91,7 +91,7 @@ export function DataTable<T extends { id?: string | number }>({
       </div>
 
       {/* Table Container with Horizontal Touch Scroll */}
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto w-full -mx-1 sm:mx-0">
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto w-full min-w-0">
         <div className="min-w-full inline-block align-middle">
           <Table className="min-w-[600px] w-full">
             <TableHeader className="bg-muted/40">

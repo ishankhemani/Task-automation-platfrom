@@ -18,9 +18,9 @@ export function BarChartWrapper({ data, xKey, yKey, height = 260, color = '#10b9
   }
 
   return (
-    <div className="w-full" style={{ height }}>
+    <div className="w-full min-w-0 overflow-hidden" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
           <XAxis dataKey={xKey} tick={{ fill: 'currentColor', fontSize: 10 }} opacity={0.7} interval="preserveStartEnd" />
           <YAxis tick={{ fill: 'currentColor', fontSize: 10 }} opacity={0.7} width={35} />
