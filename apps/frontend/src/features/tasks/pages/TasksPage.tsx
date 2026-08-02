@@ -8,7 +8,7 @@ import { TaskFilterPanel } from '../components/TaskFilterPanel.js';
 import { TaskBuilderModal } from '../components/TaskBuilderModal.js';
 import { TaskDetailDrawer } from '../components/TaskDetailDrawer.js';
 import { Button } from '../../../components/ui/button.js';
-import { Plus, Eye, RotateCcw, Ban, Copy, Trash2 } from 'lucide-react';
+import { Plus, Eye, Edit2, RotateCcw, Ban, Copy, Trash2 } from 'lucide-react';
 
 export function TasksPage() {
   const [filters, setFilters] = useState<TasksListQueryParams>({
@@ -73,6 +73,13 @@ export function TasksPage() {
             title="View Details"
           >
             <Eye className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setSelectedTaskId(row.id)}
+            className="p-1.5 sm:p-2 text-muted-foreground hover:text-primary rounded hover:bg-primary/10 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center"
+            title="Edit Task"
+          >
+            <Edit2 className="w-4 h-4" />
           </button>
           {row.status !== 'COMPLETED' && row.status !== 'CANCELLED' && (
             <button

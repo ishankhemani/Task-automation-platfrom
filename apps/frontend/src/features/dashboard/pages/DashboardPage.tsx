@@ -10,7 +10,8 @@ import { StatusBadge } from '../../../components/common/StatusBadge.js';
 import { AreaChartWrapper } from '../../../components/data-display/charts/AreaChartWrapper.js';
 import { BarChartWrapper } from '../../../components/data-display/charts/BarChartWrapper.js';
 import { TaskBuilderModal } from '../../tasks/components/TaskBuilderModal.js';
-import { CheckSquare, Cpu, Layers, Activity, Plus, RefreshCw } from 'lucide-react';
+import { queuesApi } from '../../queues/api/queuesApi.js';
+import { CheckSquare, Cpu, Layers, Activity, Plus, RefreshCw, CheckCircle2, XCircle, Server } from 'lucide-react';
 import { Button } from '../../../components/ui/button.js';
 import { showSuccess } from '../../../lib/toast.js';
 
@@ -24,6 +25,14 @@ export function DashboardPage() {
     queryFn: () => analyticsApi.getMetrics(7),
     staleTime: 60_000,
   });
+
+  // Fetch real queue stats for Dashboard Queue Status section
+  const { data: queueStatsResponse } = useQuery({
+    queryKey: ['queues', 'stats'],
+    queryFn: () => queuesApi.getStats(),
+    refetchInterval: 10_000,
+  });
+  const queueStats = queueStatsResponse?.data || [];
 
   const stats = data?.stats || {
     totalTasks: 0,
@@ -113,40 +122,116 @@ export function DashboardPage() {
       />
 
       {/* Metrics Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         <StatCard
-          title="Total Tasks Executed"
+          title="Total Tasks"
           value={stats.totalTasks.toString()}
-          change={`${stats.completedCount} finished`}
+          change="All-time dispatched"
           trend="up"
-          icon={<CheckSquare className="w-5 h-5" />}
+          icon={<CheckSquare className="w-5 h-5 text-primary" />}
           description="Total automated jobs processed"
         />
         <StatCard
-          title="Queue Depth (Pending / Processing)"
-          value={`${stats.pendingCount + stats.processingCount}`}
-          change={`${stats.processingCount} active`}
-          trend="neutral"
-          icon={<Cpu className="w-5 h-5" />}
-          description="Active jobs in BullMQ execution pipelines"
+          title="Completed Tasks"
+          value={stats.completedCount.toString()}
+          change={`${stats.successRate}% rate`}
+          trend="up"
+          icon={<CheckCircle2 className="w-5 h-5 text-emerald-500" />}
+          description="Successfully finished jobs"
         />
         <StatCard
-          title="Execution Success Rate"
+          title="Failed Tasks"
+          value={stats.failedCount.toString()}
+          change={`${stats.failureRate}% rate`}
+          trend={stats.failedCount > 0 ? 'down' : 'up'}
+          icon={<XCircle className="w-5 h-5 text-destructive" />}
+          description="Jobs requiring retry/attention"
+        />
+        <StatCard
+          title="Queue Depth"
+          value={`${stats.pendingCount + stats.processingCount}`}
+          change={`${stats.processingCount} active processing`}
+          trend="neutral"
+          icon={<Cpu className="w-5 h-5 text-amber-500" />}
+          description="Pending & active jobs in queues"
+        />
+        <StatCard
+          title="Success Rate"
           value={`${stats.successRate}%`}
-          change={`${stats.completedCount} succeeded`}
+          change="SLO target >= 99.9%"
           trend="up"
-          icon={<Layers className="w-5 h-5" />}
-          description="Target SLO reliability benchmark >= 99.9%"
+          icon={<Layers className="w-5 h-5 text-primary" />}
+          description="Execution reliability index"
         />
         <StatCard
           title="Failure Rate"
           value={`${stats.failureRate}%`}
-          change={`${stats.failedCount} failed`}
+          change="Retry orchestration"
           trend={stats.failedCount > 0 ? 'down' : 'up'}
-          icon={<Activity className="w-5 h-5" />}
-          description="Jobs requiring retry orchestration"
+          icon={<Activity className="w-5 h-5 text-muted-foreground" />}
+          description="Failed execution ratio"
         />
       </div>
+
+      {/* Live BullMQ Queue Health & Telemetry Status Card */}
+      <GlassCard>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Server className="w-4 h-4 text-primary" /> Live Queue Status & Telemetry
+            </h3>
+            <p className="text-xs text-muted-foreground">Distributed BullMQ queues status, waiting depth, and worker load</p>
+          </div>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium self-start sm:self-auto flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live Telemetry
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {queueStats.length > 0 ? (
+            queueStats.map((q) => (
+              <div key={q.queueName} className="p-3.5 rounded-xl border border-border bg-background/50 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-xs text-foreground truncate max-w-[140px]" title={q.queueName}>
+                    {q.queueName}
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border ${
+                      q.paused
+                        ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                        : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                    }`}
+                  >
+                    {q.paused ? 'PAUSED' : 'ACTIVE'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-border/50">
+                  <div>
+                    <span className="text-[10px] text-muted-foreground block">Waiting</span>
+                    <span className="font-bold text-foreground">{q.waiting}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-muted-foreground block">Processing</span>
+                    <span className="font-bold text-primary">{q.active}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-muted-foreground block">Completed</span>
+                    <span className="font-bold text-emerald-500">{q.completed}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-muted-foreground block">Failed</span>
+                    <span className="font-bold text-destructive">{q.failed}</span>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full py-4 text-center text-xs text-muted-foreground">
+              Loading live queue metrics...
+            </div>
+          )}
+        </div>
+      </GlassCard>
 
       {/* Analytics Charts — driven by real 7-day time-series from /api/v1/analytics/metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">

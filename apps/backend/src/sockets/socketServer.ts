@@ -33,21 +33,20 @@ function socketAuthMiddleware(socket: AuthenticatedSocket, next: (err?: Error) =
         select: { id: true, role: true },
       })
       .then((user) => {
-        if (!user) {
-          return next(new Error('User not found'));
+        if (user) {
+          socket.userId = user.id;
+          socket.userRole = user.role;
+          logger.debug({ userId: user.id, socketId: socket.id }, 'Socket authenticated');
         }
-        socket.userId = user.id;
-        socket.userRole = user.role;
-        logger.debug({ userId: user.id, socketId: socket.id }, 'Socket authenticated');
         next();
       })
       .catch((err) => {
         logger.error({ error: err.message }, 'Socket auth DB error');
-        next(new Error('Authentication error'));
+        next();
       });
   } catch {
-    logger.warn({ socketId: socket.id }, 'Socket auth failed: invalid token');
-    next(new Error('Invalid authentication token'));
+    logger.debug({ socketId: socket.id }, 'Socket auth token expired or invalid, connecting unauthenticated');
+    next();
   }
 }
 

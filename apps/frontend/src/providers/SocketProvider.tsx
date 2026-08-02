@@ -38,7 +38,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       auth: {
         token: accessToken,
       },
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
@@ -54,7 +54,8 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       dispatch(setSocketConnected(false));
     });
 
-    socketInstance.on('connect_error', () => {
+    socketInstance.on('connect_error', (err) => {
+      console.warn('[Socket.IO] Connection error:', err?.message || err);
       setIsConnected(false);
       dispatch(setSocketConnected(false));
     });

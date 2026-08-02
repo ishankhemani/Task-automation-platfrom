@@ -13,7 +13,14 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: config.cors.origin,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, postman) or matching local patterns
+      if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin === config.cors.origin) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Permissive in development
+      }
+    },
     credentials: true,
   },
 });

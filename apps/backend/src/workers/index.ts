@@ -54,19 +54,26 @@ async function processJob(job: Job): Promise<unknown> {
   }
 
   try {
-    // Simulate multi-step processing with progress reporting
-    await job.updateProgress(25);
-    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 25, status: TaskStatus.PROCESSING });
+    // Initial queue pickup pause to allow PENDING state visibility
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await job.updateProgress(50);
-    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 50, status: TaskStatus.PROCESSING });
+    // Simulate realistic multi-step processing with live socket progress reporting
+    await job.updateProgress(20);
+    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 20, status: TaskStatus.PROCESSING });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await job.updateProgress(75);
-    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 75, status: TaskStatus.PROCESSING });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await job.updateProgress(40);
+    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 40, status: TaskStatus.PROCESSING });
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await job.updateProgress(60);
+    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 60, status: TaskStatus.PROCESSING });
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await job.updateProgress(80);
+    io?.emit(SOCKET_EVENTS.JOB_PROGRESS, { taskId, jobId: job.id, progress: 80, status: TaskStatus.PROCESSING });
+
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     await job.updateProgress(100);
 
     const executionTime = Date.now() - startTime;

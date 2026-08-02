@@ -46,13 +46,13 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Theme Settings Card */}
-      <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+      <div className="p-4 sm:p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
+        <h2 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
           <Monitor className="w-5 h-5 text-primary" /> Appearance Mode
         </h2>
         <p className="text-xs text-muted-foreground">Select your visual theme preference for the dashboard interface.</p>
 
-        <div className="grid grid-cols-3 gap-4 pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
           <button
             type="button"
             onClick={() => setTheme('light')}
@@ -95,21 +95,21 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Real-time Notifications & Sockets Card */}
-      <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+      <div className="p-4 sm:p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
+        <h2 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
           <Bell className="w-5 h-5 text-primary" /> Real-time Notifications & WebSockets
         </h2>
 
         <div className="space-y-3 divide-y divide-border">
-          <div className="flex items-center justify-between pt-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">In-App Toast Alerts</p>
-              <p className="text-xs text-muted-foreground">Receive instant popups when tasks transition between queue states.</p>
+          <div className="flex items-center justify-between gap-3 pt-3">
+            <div className="pr-2">
+              <p className="text-xs sm:text-sm font-medium text-foreground">In-App Toast Alerts</p>
+              <p className="text-[11px] sm:text-xs text-muted-foreground">Receive instant popups when tasks transition between queue states.</p>
             </div>
             <button
               type="button"
               onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${
+              className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
                 notificationsEnabled ? 'bg-primary' : 'bg-muted'
               }`}
             >
@@ -121,17 +121,17 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between pt-3">
-            <div>
-              <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-3 pt-3">
+            <div className="pr-2">
+              <p className="text-xs sm:text-sm font-medium text-foreground flex items-center gap-1.5">
                 {soundEnabled ? <Volume2 className="w-4 h-4 text-primary" /> : <VolumeX className="w-4 h-4 text-muted-foreground" />} Sound Effects
               </p>
-              <p className="text-xs text-muted-foreground">Play a subtle chime sound when a BullMQ job completes or fails.</p>
+              <p className="text-[11px] sm:text-xs text-muted-foreground">Play a subtle chime sound when a BullMQ job completes or fails.</p>
             </div>
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${
+              className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
                 soundEnabled ? 'bg-primary' : 'bg-muted'
               }`}
             >
@@ -143,15 +143,15 @@ export const SettingsPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex items-center justify-between pt-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">Auto-Refresh Dashboard Charts</p>
-              <p className="text-xs text-muted-foreground">Automatically re-fetch queue throughput and active worker counts every 10 seconds.</p>
+          <div className="flex items-center justify-between gap-3 pt-3">
+            <div className="pr-2">
+              <p className="text-xs sm:text-sm font-medium text-foreground">Auto-Refresh Dashboard Charts</p>
+              <p className="text-[11px] sm:text-xs text-muted-foreground">Automatically re-fetch queue throughput and active worker counts every 10 seconds.</p>
             </div>
             <button
               type="button"
               onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${
+              className={`w-11 h-6 rounded-full transition-colors shrink-0 relative ${
                 autoRefresh ? 'bg-primary' : 'bg-muted'
               }`}
             >
@@ -166,35 +166,35 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Environment & System Information Card */}
-      <div className="p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+      <div className="p-4 sm:p-6 rounded-xl border border-border bg-card shadow-sm space-y-4">
+        <h2 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
           <Database className="w-5 h-5 text-primary" /> System Architecture Information
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          <div className="p-3.5 rounded-lg border border-border bg-background/50 flex items-center justify-between">
-            <span className="text-muted-foreground flex items-center gap-1.5">
-              <Radio className="w-4 h-4 text-emerald-500" /> Socket.IO Connection
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+          <div className="p-3 rounded-lg border border-border bg-background/50 flex items-center justify-between gap-2">
+            <span className="text-muted-foreground flex items-center gap-1.5 truncate">
+              <Radio className="w-4 h-4 text-emerald-500 shrink-0" /> Socket.IO Connection
             </span>
-            <span className="font-semibold text-emerald-500 flex items-center gap-1">
+            <span className="font-semibold text-emerald-500 flex items-center gap-1 shrink-0">
               <CheckCircle className="w-3.5 h-3.5" /> Connected
             </span>
           </div>
 
-          <div className="p-3.5 rounded-lg border border-border bg-background/50 flex items-center justify-between">
-            <span className="text-muted-foreground flex items-center gap-1.5">
-              <Cpu className="w-4 h-4 text-primary" /> BullMQ Engine
+          <div className="p-3 rounded-lg border border-border bg-background/50 flex items-center justify-between gap-2">
+            <span className="text-muted-foreground flex items-center gap-1.5 truncate">
+              <Cpu className="w-4 h-4 text-primary shrink-0" /> BullMQ Engine
             </span>
-            <span className="font-semibold text-foreground">Redis Cluster</span>
+            <span className="font-semibold text-foreground shrink-0">Redis Cluster</span>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-2">
         <button
           type="button"
           onClick={handleSavePreferences}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-sm ${
+          className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-sm ${
             saved
               ? 'bg-emerald-500 text-white'
               : 'bg-primary text-primary-foreground hover:bg-primary/90'
