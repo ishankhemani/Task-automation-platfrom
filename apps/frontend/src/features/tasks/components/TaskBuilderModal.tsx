@@ -8,7 +8,8 @@ import { Textarea } from '../../../components/ui/textarea.js';
 import { FormFieldWrapper } from '../../../components/forms/FormFieldWrapper.js';
 import { useTaskMutations } from '../hooks/useTaskQueries.js';
 import { Priority } from '../types/tasks.types.js';
-import { Plus, Paperclip } from 'lucide-react';
+import { FileUploader } from '../../../components/common/FileUploader.js';
+import { Plus } from 'lucide-react';
 
 const createTaskValidationSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title is too long'),
@@ -31,6 +32,7 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
   const {
     register,
     handleSubmit,
+    setValue,
     reset,
     formState: { errors },
   } = useForm<CreateTaskFormType>({
@@ -103,16 +105,21 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
             </FormFieldWrapper>
           </div>
 
-          <FormFieldWrapper label="File Attachment URL / Key" error={errors.attachment?.message}>
-            <div className="relative">
-              <Paperclip className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                {...register('attachment')}
-                placeholder="https://storage.provider.com/file.pdf"
-                className="pl-9 min-h-[40px] sm:min-h-[38px]"
-              />
-            </div>
-          </FormFieldWrapper>
+          <div className="space-y-2">
+            <FileUploader
+              label="Task Attachment (Optional)"
+              allowedTypes={['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']}
+              onUploadSuccess={(url) => {
+                setValue('attachment', url);
+              }}
+              acceptText="Upload PDF or Image attachment for task context"
+            />
+            <Input
+              {...register('attachment')}
+              placeholder="Or paste attachment URL directly..."
+              className="text-xs min-h-[38px]"
+            />
+          </div>
 
           <DialogFooter className="pt-2 flex flex-col-reverse sm:flex-row gap-2">
             <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto min-h-[44px] sm:min-h-[38px]">
