@@ -52,7 +52,7 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-md">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md">
       {/* Current Password */}
       <FormFieldWrapper label="Current Password" error={errors.currentPassword?.message} required>
         <div className="relative">
@@ -63,7 +63,7 @@ export function ChangePasswordForm() {
             placeholder="••••••••"
             autoComplete="current-password"
             error={!!errors.currentPassword}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
@@ -78,12 +78,12 @@ export function ChangePasswordForm() {
             placeholder="••••••••"
             autoComplete="new-password"
             error={!!errors.newPassword}
-            className="pl-9 pr-10"
+            className="pl-9 pr-10 min-h-[44px]"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
             tabIndex={-1}
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -101,12 +101,12 @@ export function ChangePasswordForm() {
             placeholder="••••••••"
             autoComplete="new-password"
             error={!!errors.confirmPassword}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
 
-      <Button type="submit" className="font-semibold" isLoading={isChangingPassword}>
+      <Button type="submit" className="font-semibold min-h-[44px]" isLoading={isChangingPassword}>
         <ShieldCheck className="w-4 h-4 mr-2" /> Update Password
       </Button>
     </form>

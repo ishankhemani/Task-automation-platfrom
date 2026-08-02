@@ -47,7 +47,7 @@ export function ForgotPasswordForm() {
         </p>
         <Link
           to={ROUTES.LOGIN}
-          className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-primary bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
+          className="inline-flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-primary bg-primary/10 rounded-md hover:bg-primary/20 transition-colors min-h-[44px]"
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Sign In
         </Link>
@@ -70,17 +70,17 @@ export function ForgotPasswordForm() {
             placeholder="name@company.com"
             autoComplete="email"
             error={!!errors.email}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
 
-      <Button type="submit" className="w-full font-semibold" isLoading={isForgotSending}>
+      <Button type="submit" className="w-full font-semibold min-h-[44px]" isLoading={isForgotSending}>
         <Send className="w-4 h-4 mr-2" /> Send Reset Link
       </Button>
 
       <div className="text-center pt-2">
-        <Link to={ROUTES.LOGIN} className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground font-medium">
+        <Link to={ROUTES.LOGIN} className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground font-medium min-h-[40px]">
           <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Sign In
         </Link>
       </div>

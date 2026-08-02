@@ -65,7 +65,7 @@ export function ResetPasswordForm() {
               type="text"
               placeholder="Paste token from email..."
               error={!!errors.token}
-              className="pl-9"
+              className="pl-9 min-h-[44px]"
             />
           </div>
         </FormFieldWrapper>
@@ -81,12 +81,12 @@ export function ResetPasswordForm() {
             placeholder="••••••••"
             autoComplete="new-password"
             error={!!errors.newPassword}
-            className="pl-9 pr-10"
+            className="pl-9 pr-10 min-h-[44px]"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
             tabIndex={-1}
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -104,17 +104,17 @@ export function ResetPasswordForm() {
             placeholder="••••••••"
             autoComplete="new-password"
             error={!!errors.confirmPassword}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
 
-      <Button type="submit" className="w-full font-semibold" isLoading={isResetting}>
+      <Button type="submit" className="w-full font-semibold min-h-[44px]" isLoading={isResetting}>
         Reset Password
       </Button>
 
       <div className="text-center pt-2">
-        <Link to={ROUTES.LOGIN} className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground font-medium">
+        <Link to={ROUTES.LOGIN} className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground font-medium min-h-[40px]">
           <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Sign In
         </Link>
       </div>

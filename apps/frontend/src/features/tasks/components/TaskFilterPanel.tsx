@@ -18,7 +18,7 @@ export function TaskFilterPanel({ filters, onChange, onReset }: TaskFilterPanelP
           value={filters.search || ''}
           onChange={(e) => onChange({ ...filters, search: e.target.value, page: 1 })}
           placeholder="Filter by title or content..."
-          className="w-full px-3 py-1.5 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+          className="w-full px-3 py-2 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none min-h-[40px] sm:min-h-[36px]"
         />
       </div>
 
@@ -28,7 +28,7 @@ export function TaskFilterPanel({ filters, onChange, onReset }: TaskFilterPanelP
         <select
           value={filters.status || ''}
           onChange={(e) => onChange({ ...filters, status: (e.target.value as TaskStatus) || undefined, page: 1 })}
-          className="w-full px-3 py-1.5 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+          className="w-full px-3 py-2 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none min-h-[40px] sm:min-h-[36px]"
         >
           <option value="">All Statuses</option>
           <option value="PENDING">PENDING</option>
@@ -45,7 +45,7 @@ export function TaskFilterPanel({ filters, onChange, onReset }: TaskFilterPanelP
         <select
           value={filters.priority || ''}
           onChange={(e) => onChange({ ...filters, priority: (e.target.value as Priority) || undefined, page: 1 })}
-          className="w-full px-3 py-1.5 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+          className="w-full px-3 py-2 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none min-h-[40px] sm:min-h-[36px]"
         >
           <option value="">All Priorities</option>
           <option value="LOW">LOW</option>
@@ -61,7 +61,7 @@ export function TaskFilterPanel({ filters, onChange, onReset }: TaskFilterPanelP
         <select
           value={filters.sortBy || 'createdAt'}
           onChange={(e) => onChange({ ...filters, sortBy: e.target.value, page: 1 })}
-          className="w-full px-3 py-1.5 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+          className="w-full px-3 py-2 text-xs rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none min-h-[40px] sm:min-h-[36px]"
         >
           <option value="createdAt">Date Created</option>
           <option value="title">Task Title</option>

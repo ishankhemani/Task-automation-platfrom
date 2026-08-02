@@ -55,7 +55,7 @@ export function LoginForm() {
             placeholder="name@company.com"
             autoComplete="email"
             error={!!errors.email}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
@@ -70,12 +70,12 @@ export function LoginForm() {
             placeholder="••••••••"
             autoComplete="current-password"
             error={!!errors.password}
-            className="pl-9 pr-10"
+            className="pl-9 pr-10 min-h-[44px]"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
             tabIndex={-1}
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -85,25 +85,25 @@ export function LoginForm() {
 
       {/* Remember Me & Forgot Password Links */}
       <div className="flex items-center justify-between text-xs pt-1">
-        <label className="flex items-center gap-2 cursor-pointer text-muted-foreground hover:text-foreground select-none">
+        <label className="flex items-center gap-2 cursor-pointer text-muted-foreground hover:text-foreground select-none min-h-[40px]">
           <input
             type="checkbox"
             {...register('rememberMe')}
-            className="rounded border-input text-primary focus:ring-primary h-3.5 w-3.5"
+            className="rounded border-input text-primary focus:ring-primary h-4 w-4"
           />
           <span>Remember preference</span>
         </label>
 
         <Link
           to={ROUTES.FORGOT_PASSWORD}
-          className="text-primary font-medium hover:underline transition-all"
+          className="text-primary font-medium hover:underline transition-all min-h-[40px] flex items-center"
         >
           Forgot password?
         </Link>
       </div>
 
       {/* Submit Button */}
-      <Button type="submit" className="w-full font-semibold" isLoading={isLoggingIn}>
+      <Button type="submit" className="w-full font-semibold min-h-[44px]" isLoading={isLoggingIn}>
         Sign In to Platform <ArrowRight className="w-4 h-4 ml-2" />
       </Button>
 

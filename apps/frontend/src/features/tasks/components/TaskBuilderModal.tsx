@@ -85,11 +85,11 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
             />
           </FormFieldWrapper>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormFieldWrapper label="Priority Level">
               <select
                 {...register('priority')}
-                className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none min-h-[40px] sm:min-h-[38px]"
               >
                 <option value="LOW">LOW</option>
                 <option value="MEDIUM">MEDIUM</option>
@@ -99,7 +99,7 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
             </FormFieldWrapper>
 
             <FormFieldWrapper label="Scheduled Time">
-              <Input {...register('scheduledTime')} type="datetime-local" className="text-xs" />
+              <Input {...register('scheduledTime')} type="datetime-local" className="text-xs min-h-[40px] sm:min-h-[38px]" />
             </FormFieldWrapper>
           </div>
 
@@ -109,16 +109,16 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
               <Input
                 {...register('attachment')}
                 placeholder="https://storage.provider.com/file.pdf"
-                className="pl-9"
+                className="pl-9 min-h-[40px] sm:min-h-[38px]"
               />
             </div>
           </FormFieldWrapper>
 
-          <DialogFooter className="pt-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <DialogFooter className="pt-2 flex flex-col-reverse sm:flex-row gap-2">
+            <Button type="button" variant="outline" onClick={onClose} className="w-full sm:w-auto min-h-[44px] sm:min-h-[38px]">
               Cancel
             </Button>
-            <Button type="submit" isLoading={isCreating} className="font-semibold">
+            <Button type="submit" isLoading={isCreating} className="w-full sm:w-auto font-semibold min-h-[44px] sm:min-h-[38px]">
               Enqueue Task
             </Button>
           </DialogFooter>

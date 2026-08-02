@@ -21,16 +21,16 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
     <Dialog open={!!taskId} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-bold">{task?.title || 'Task Details'}</DialogTitle>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <DialogTitle className="text-lg sm:text-xl font-bold break-words">{task?.title || 'Task Details'}</DialogTitle>
             {task && (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <TaskStatusBadge status={task.status} />
                 <PriorityBadge priority={task.priority} />
               </div>
             )}
           </div>
-          <DialogDescription>ID: {taskId}</DialogDescription>
+          <DialogDescription className="break-all text-xs">ID: {taskId}</DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
@@ -42,32 +42,32 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
             {/* Description Section */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Description</h4>
-              <p className="text-foreground bg-muted/40 p-3 rounded-lg border border-border">
+              <p className="text-foreground bg-muted/40 p-3 rounded-lg border border-border text-xs sm:text-sm leading-relaxed break-words">
                 {task.description || 'No description provided.'}
               </p>
             </div>
 
             {/* Metadata Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-lg border border-border bg-card">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-3 rounded-lg border border-border bg-card">
               <div>
                 <span className="text-xs text-muted-foreground block">Created By</span>
-                <span className="font-semibold">{task.author?.name || 'System'}</span>
+                <span className="font-semibold text-xs sm:text-sm">{task.author?.name || 'System'}</span>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground block">Assignee</span>
-                <span className="font-semibold">{task.assignee?.name || 'Unassigned'}</span>
+                <span className="font-semibold text-xs sm:text-sm">{task.assignee?.name || 'Unassigned'}</span>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground block">Retry Count</span>
-                <span className="font-semibold">{task.retryCount}</span>
+                <span className="font-semibold text-xs sm:text-sm">{task.retryCount}</span>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground block">Created At</span>
-                <span className="font-semibold">{new Date(task.createdAt).toLocaleString()}</span>
+                <span className="font-semibold text-xs sm:text-sm">{new Date(task.createdAt).toLocaleString()}</span>
               </div>
               <div>
                 <span className="text-xs text-muted-foreground block">Updated At</span>
-                <span className="font-semibold">{new Date(task.updatedAt).toLocaleString()}</span>
+                <span className="font-semibold text-xs sm:text-sm">{new Date(task.updatedAt).toLocaleString()}</span>
               </div>
               {task.attachment && (
                 <div>
@@ -76,16 +76,16 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
                     href={task.attachment}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-primary font-medium hover:underline flex items-center gap-1"
+                    className="text-primary font-medium hover:underline flex items-center gap-1 text-xs sm:text-sm truncate"
                   >
-                    <Paperclip className="w-3.5 h-3.5" /> File Link
+                    <Paperclip className="w-3.5 h-3.5 shrink-0" /> File Link
                   </a>
                 </div>
               )}
             </div>
 
             {/* Actions Toolbar */}
-            <div className="flex flex-wrap gap-2 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2">
               {task.status !== 'COMPLETED' && task.status !== 'CANCELLED' && (
                 <Button
                   variant="outline"

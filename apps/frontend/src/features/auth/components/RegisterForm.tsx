@@ -91,7 +91,7 @@ export function RegisterForm() {
             placeholder="John Doe"
             autoComplete="name"
             error={!!errors.name}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
@@ -106,7 +106,7 @@ export function RegisterForm() {
             placeholder="name@company.com"
             autoComplete="email"
             error={!!errors.email}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
@@ -121,12 +121,12 @@ export function RegisterForm() {
             placeholder="••••••••"
             autoComplete="new-password"
             error={!!errors.password}
-            className="pl-9 pr-10"
+            className="pl-9 pr-10 min-h-[44px]"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
             tabIndex={-1}
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -159,7 +159,7 @@ export function RegisterForm() {
               />
             ))}
           </div>
-          <div className="grid grid-cols-2 gap-1 text-[11px] text-muted-foreground pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[11px] text-muted-foreground pt-1">
             <span className={hasMinLen ? 'text-emerald-500 flex items-center gap-1' : ''}>
               ✓ Min 8 characters
             </span>
@@ -186,14 +186,14 @@ export function RegisterForm() {
             placeholder="••••••••"
             autoComplete="new-password"
             error={!!errors.confirmPassword}
-            className="pl-9"
+            className="pl-9 min-h-[44px]"
           />
         </div>
       </FormFieldWrapper>
 
       {/* Terms and Conditions Checkbox */}
       <FormFieldWrapper error={errors.termsAccepted?.message}>
-        <label className="flex items-start gap-2 cursor-pointer text-xs text-muted-foreground select-none pt-1">
+        <label className="flex items-start gap-2 cursor-pointer text-xs text-muted-foreground select-none pt-1 min-h-[44px]">
           <input
             type="checkbox"
             {...register('termsAccepted')}
@@ -213,7 +213,7 @@ export function RegisterForm() {
       </FormFieldWrapper>
 
       {/* Submit Button */}
-      <Button type="submit" className="w-full font-semibold" isLoading={isRegistering}>
+      <Button type="submit" className="w-full font-semibold min-h-[44px]" isLoading={isRegistering}>
         <ShieldCheck className="w-4 h-4 mr-2" /> Create Enterprise Account
       </Button>
 

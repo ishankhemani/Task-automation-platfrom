@@ -4,6 +4,8 @@ import { env } from '../config/env.js';
 import { useAppDispatch, useAppSelector } from '../store/index.js';
 import { setSocketConnected, addRoom, removeRoom } from '../store/slices/socketSlice.js';
 import { SOCKET_EVENTS } from '@task-platform/shared';
+import { useQueryClient } from '@tanstack/react-query';
+import { showSuccess, showError } from '../lib/toast.js';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -16,6 +18,7 @@ export const SocketContext = createContext<SocketContextType | null>(null);
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const { accessToken, isAuthenticated } = useAppSelector((state) => state.auth);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -56,13 +59,40 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       dispatch(setSocketConnected(false));
     });
 
+    // Real-time background job updates
+    socketInstance.on(SOCKET_EVENTS.JOB_PROGRESS, (payload: { taskId: string; progress: number }) => {
+      if (payload?.taskId) {
+        queryClient.invalidateQueries({ queryKey: ['task', payload.taskId] });
+      }
+    });
+
+    socketInstance.on(SOCKET_EVENTS.JOB_COMPLETED, (payload: { taskId: string }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['queues'] });
+      if (payload?.taskId) {
+        queryClient.invalidateQueries({ queryKey: ['task', payload.taskId] });
+      }
+      showSuccess('Background job execution completed!');
+    });
+
+    socketInstance.on(SOCKET_EVENTS.JOB_FAILED, (payload: { taskId: string; error?: string }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['queues'] });
+      if (payload?.taskId) {
+        queryClient.invalidateQueries({ queryKey: ['task', payload.taskId] });
+      }
+      showError(payload.error || 'Background job execution failed.');
+    });
+
     setSocket(socketInstance);
 
     return () => {
       socketInstance.disconnect();
       dispatch(setSocketConnected(false));
     };
-  }, [isAuthenticated, accessToken]);
+  }, [isAuthenticated, accessToken, queryClient, dispatch]);
 
   const subscribeToTask = (taskId: string) => {
     if (socket && taskId) {

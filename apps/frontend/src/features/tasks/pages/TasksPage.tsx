@@ -38,7 +38,7 @@ export function TasksPage() {
             {row.title}
           </button>
           {row.description && (
-            <p className="text-xs text-muted-foreground truncate max-w-xs">{row.description}</p>
+            <p className="text-xs text-muted-foreground truncate max-w-[150px] sm:max-w-xs">{row.description}</p>
           )}
         </div>
       ),
@@ -66,10 +66,10 @@ export function TasksPage() {
     {
       header: 'Actions',
       accessorKey: (row: TaskItem) => (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           <button
             onClick={() => setSelectedTaskId(row.id)}
-            className="p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
+            className="p-1.5 sm:p-2 text-muted-foreground hover:text-foreground rounded hover:bg-accent min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
@@ -77,7 +77,7 @@ export function TasksPage() {
           {row.status !== 'COMPLETED' && row.status !== 'CANCELLED' && (
             <button
               onClick={() => cancelTask(row.id)}
-              className="p-1.5 text-muted-foreground hover:text-amber-500 rounded hover:bg-amber-500/10"
+              className="p-1.5 sm:p-2 text-muted-foreground hover:text-amber-500 rounded hover:bg-amber-500/10 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center"
               title="Cancel Task"
             >
               <Ban className="w-4 h-4" />
@@ -85,14 +85,14 @@ export function TasksPage() {
           )}
           <button
             onClick={() => retryTask(row.id)}
-            className="p-1.5 text-muted-foreground hover:text-primary rounded hover:bg-primary/10"
+            className="p-1.5 sm:p-2 text-muted-foreground hover:text-primary rounded hover:bg-primary/10 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center"
             title="Retry Task"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={() => duplicateTask(row.id)}
-            className="p-1.5 text-muted-foreground hover:text-foreground rounded hover:bg-accent"
+            className="p-1.5 sm:p-2 text-muted-foreground hover:text-foreground rounded hover:bg-accent min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center"
             title="Duplicate"
           >
             <Copy className="w-4 h-4" />
@@ -101,7 +101,7 @@ export function TasksPage() {
             onClick={() => {
               if (confirm('Delete task?')) deleteTask(row.id);
             }}
-            className="p-1.5 text-muted-foreground hover:text-destructive rounded hover:bg-destructive/10"
+            className="p-1.5 sm:p-2 text-muted-foreground hover:text-destructive rounded hover:bg-destructive/10 min-h-[36px] min-w-[36px] sm:min-h-[40px] sm:min-w-[40px] flex items-center justify-center"
             title="Delete"
           >
             <Trash2 className="w-4 h-4" />
@@ -112,13 +112,13 @@ export function TasksPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <PageHeader
         title="Tasks Management"
         description="Configure, schedule, and monitor automated job queue dispatches"
         breadcrumbs={[{ label: 'Platform', href: '#' }, { label: 'Tasks' }]}
         actions={
-          <Button size="sm" onClick={() => setIsBuilderOpen(true)}>
+          <Button size="sm" className="min-h-[44px] sm:min-h-[36px]" onClick={() => setIsBuilderOpen(true)}>
             <Plus className="w-4 h-4 mr-2" /> Create Task
           </Button>
         }
