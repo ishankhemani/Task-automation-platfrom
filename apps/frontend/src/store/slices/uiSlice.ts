@@ -3,6 +3,7 @@ import { STORAGE_KEYS } from '../../config/constants.js';
 
 interface UIState {
   sidebarCollapsed: boolean;
+  mobileSidebarOpen: boolean;
   theme: 'light' | 'dark' | 'system';
   activeModal: string | null;
   notificationDrawerOpen: boolean;
@@ -15,6 +16,7 @@ const getInitialSidebarState = (): boolean => {
 
 const initialState: UIState = {
   sidebarCollapsed: getInitialSidebarState(),
+  mobileSidebarOpen: false,
   theme: 'dark',
   activeModal: null,
   notificationDrawerOpen: false,
@@ -31,6 +33,15 @@ export const uiSlice = createSlice({
     setSidebarCollapsed: (state, action: PayloadAction<boolean>) => {
       state.sidebarCollapsed = action.payload;
       localStorage.setItem(STORAGE_KEYS.SIDEBAR_COLLAPSED, JSON.stringify(action.payload));
+    },
+    toggleMobileSidebar: (state) => {
+      state.mobileSidebarOpen = !state.mobileSidebarOpen;
+    },
+    setMobileSidebarOpen: (state, action: PayloadAction<boolean>) => {
+      state.mobileSidebarOpen = action.payload;
+    },
+    closeMobileSidebar: (state) => {
+      state.mobileSidebarOpen = false;
     },
     setTheme: (state, action: PayloadAction<'light' | 'dark' | 'system'>) => {
       state.theme = action.payload;
@@ -53,6 +64,9 @@ export const uiSlice = createSlice({
 export const {
   toggleSidebar,
   setSidebarCollapsed,
+  toggleMobileSidebar,
+  setMobileSidebarOpen,
+  closeMobileSidebar,
   setTheme,
   openModal,
   closeModal,

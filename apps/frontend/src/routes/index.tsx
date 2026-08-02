@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { AppLayout } from '../components/layout/AppLayout.js';
 import { AuthLayout } from '../components/layout/AuthLayout.js';
 import { ProtectedRoute } from './ProtectedRoute.js';
@@ -7,33 +8,40 @@ import { RoleGuardRoute } from './RoleGuard.js';
 import { ROUTES } from '../config/constants.js';
 import { UserRole } from '@task-platform/shared';
 
-import { LoginPage } from '../features/auth/pages/LoginPage.js';
-import { RegisterPage } from '../features/auth/pages/RegisterPage.js';
-import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage.js';
-import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage.js';
-import { UnauthorizedPage } from '../features/auth/pages/UnauthorizedPage.js';
-import { SessionExpiredPage } from '../features/auth/pages/SessionExpiredPage.js';
+// Lazy-loaded page components for code-splitting
+const LoginPage = lazy(() => import('../features/auth/pages/LoginPage.js').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage.js').then(m => ({ default: m.RegisterPage })));
+const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage.js').then(m => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('../features/auth/pages/ResetPasswordPage.js').then(m => ({ default: m.ResetPasswordPage })));
+const UnauthorizedPage = lazy(() => import('../features/auth/pages/UnauthorizedPage.js').then(m => ({ default: m.UnauthorizedPage })));
+const SessionExpiredPage = lazy(() => import('../features/auth/pages/SessionExpiredPage.js').then(m => ({ default: m.SessionExpiredPage })));
 
-import { DashboardPage } from '../features/dashboard/pages/DashboardPage.js';
-import { TasksPage } from '../features/tasks/pages/TasksPage.js';
-import { AnalyticsPage } from '../features/analytics/pages/AnalyticsPage.js';
+const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage.js').then(m => ({ default: m.DashboardPage })));
+const TasksPage = lazy(() => import('../features/tasks/pages/TasksPage.js').then(m => ({ default: m.TasksPage })));
+const AnalyticsPage = lazy(() => import('../features/analytics/pages/AnalyticsPage.js').then(m => ({ default: m.AnalyticsPage })));
+const QueuesPage = lazy(() => import('../features/queues/pages/QueuesPage.js').then(m => ({ default: m.QueuesPage })));
+const ProfilePage = lazy(() => import('../features/profile/pages/ProfilePage.js').then(m => ({ default: m.ProfilePage })));
+const SettingsPage = lazy(() => import('../features/settings/pages/SettingsPage.js').then(m => ({ default: m.SettingsPage })));
 
-function ShellPlaceholder({ title }: { title: string }) {
+const AdminUsersPage = lazy(() => import('../features/admin/pages/AdminUsersPage.js').then(m => ({ default: m.AdminUsersPage })));
+const AdminWorkersPage = lazy(() => import('../features/admin/pages/AdminWorkersPage.js').then(m => ({ default: m.AdminWorkersPage })));
+const AdminLogsPage = lazy(() => import('../features/admin/pages/AdminLogsPage.js').then(m => ({ default: m.AdminLogsPage })));
+
+// Suspense fallback spinner
+function PageLoader() {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight text-foreground">{title}</h2>
-        <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
-          Foundation Shell
-        </span>
-      </div>
-      <div className="p-8 rounded-xl border border-border bg-card/50 text-center text-muted-foreground">
-        <p className="text-sm">
-          {title} shell is ready. Domain workflows will be connected in future modules.
-        </p>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <span className="text-sm text-muted-foreground">Loading...</span>
       </div>
     </div>
   );
+}
+
+// Wrap a lazy component in Suspense
+function Lazy({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PageLoader />}>{children}</Suspense>;
 }
 
 function NotFoundPage() {
@@ -63,10 +71,10 @@ export const router = createBrowserRouter([
       </GuestRoute>
     ),
     children: [
-      { path: ROUTES.LOGIN, element: <LoginPage /> },
-      { path: ROUTES.REGISTER, element: <RegisterPage /> },
-      { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
-      { path: ROUTES.RESET_PASSWORD, element: <ResetPasswordPage /> },
+      { path: ROUTES.LOGIN, element: <Lazy><LoginPage /></Lazy> },
+      { path: ROUTES.REGISTER, element: <Lazy><RegisterPage /></Lazy> },
+      { path: ROUTES.FORGOT_PASSWORD, element: <Lazy><ForgotPasswordPage /></Lazy> },
+      { path: ROUTES.RESET_PASSWORD, element: <Lazy><ResetPasswordPage /></Lazy> },
     ],
   },
 
@@ -79,19 +87,19 @@ export const router = createBrowserRouter([
     ),
     children: [
       { path: ROUTES.HOME, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
-      { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
-      { path: ROUTES.TASKS, element: <TasksPage /> },
-      { path: ROUTES.QUEUES, element: <ShellPlaceholder title="Queue & Worker Monitoring" /> },
-      { path: ROUTES.ANALYTICS, element: <AnalyticsPage /> },
-      { path: ROUTES.PROFILE, element: <ShellPlaceholder title="User Profile" /> },
-      { path: ROUTES.SETTINGS, element: <ShellPlaceholder title="Application Settings" /> },
+      { path: ROUTES.DASHBOARD, element: <Lazy><DashboardPage /></Lazy> },
+      { path: ROUTES.TASKS, element: <Lazy><TasksPage /></Lazy> },
+      { path: ROUTES.QUEUES, element: <Lazy><QueuesPage /></Lazy> },
+      { path: ROUTES.ANALYTICS, element: <Lazy><AnalyticsPage /></Lazy> },
+      { path: ROUTES.PROFILE, element: <Lazy><ProfilePage /></Lazy> },
+      { path: ROUTES.SETTINGS, element: <Lazy><SettingsPage /></Lazy> },
 
       // Admin Restricted Routes
       {
         path: ROUTES.ADMIN_USERS,
         element: (
           <RoleGuardRoute allowedRoles={[UserRole.ADMIN]}>
-            <ShellPlaceholder title="User Management" />
+            <Lazy><AdminUsersPage /></Lazy>
           </RoleGuardRoute>
         ),
       },
@@ -99,7 +107,7 @@ export const router = createBrowserRouter([
         path: ROUTES.ADMIN_WORKERS,
         element: (
           <RoleGuardRoute allowedRoles={[UserRole.ADMIN]}>
-            <ShellPlaceholder title="Worker Node Management" />
+            <Lazy><AdminWorkersPage /></Lazy>
           </RoleGuardRoute>
         ),
       },
@@ -107,7 +115,7 @@ export const router = createBrowserRouter([
         path: ROUTES.ADMIN_LOGS,
         element: (
           <RoleGuardRoute allowedRoles={[UserRole.ADMIN]}>
-            <ShellPlaceholder title="System Audit Logs" />
+            <Lazy><AdminLogsPage /></Lazy>
           </RoleGuardRoute>
         ),
       },
@@ -115,7 +123,7 @@ export const router = createBrowserRouter([
   },
 
   // Fallback Error & Unauthorized Routes
-  { path: '/unauthorized', element: <UnauthorizedPage /> },
-  { path: '/session-expired', element: <SessionExpiredPage /> },
+  { path: '/unauthorized', element: <Lazy><UnauthorizedPage /></Lazy> },
+  { path: '/session-expired', element: <Lazy><SessionExpiredPage /></Lazy> },
   { path: '*', element: <NotFoundPage /> },
 ]);
