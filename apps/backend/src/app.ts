@@ -56,6 +56,14 @@ app.use('/api/', apiLimiter);
 // Swagger Documentation
 setupSwagger(app);
 
+import path from 'path';
+import uploadsRoutes from './modules/uploads/uploads.route.js';
+import usersRoutes from './modules/users/users.route.js';
+import adminRoutes from './modules/admin/admin.route.js';
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
+
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/tasks', tasksRoutes);
@@ -63,6 +71,9 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/queues', queueRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/uploads', uploadsRoutes);
+app.use('/api/v1/users', usersRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 import healthRoutes from './modules/health/health.route.js';
 

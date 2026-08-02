@@ -6,31 +6,14 @@ export const router = Router();
 // Infrastructure & Health check
 router.use('/health', healthRouter);
 
-// Module Route Placeholders for Part 2
-router.use('/auth', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Auth endpoint skeleton initialized' });
-});
-
-router.use('/tasks', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Tasks endpoint skeleton initialized' });
-});
-
-router.use('/workflows', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Workflows endpoint skeleton initialized' });
-});
-
-router.use('/queues', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Queues endpoint skeleton initialized' });
-});
-
-router.use('/workers', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Workers endpoint skeleton initialized' });
-});
-
-router.use('/logs', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Logs endpoint skeleton initialized' });
-});
-
-router.use('/analytics', (_req, res) => {
-  res.status(501).json({ success: false, message: 'Analytics endpoint skeleton initialized' });
-});
+// NOTE: All module routes are registered directly in app.ts
+// Auth:          /api/v1/auth         → modules/auth/auth.route.ts
+// Tasks:         /api/v1/tasks        → modules/tasks/tasks.route.ts
+// Dashboard:     /api/v1/dashboard    → modules/dashboard/dashboard.route.ts
+// Analytics:     /api/v1/analytics    → modules/analytics/analytics.route.ts
+// Queues:        /api/v1/queues       → modules/queue/queue.route.ts
+// Notifications: /api/v1/notifications → modules/notifications/notifications.route.ts
+// Uploads:       /api/v1/uploads      → modules/uploads/uploads.route.ts
+// Users:         /api/v1/users        → modules/users/users.route.ts
+// Admin:         /api/v1/admin        → modules/admin/admin.route.ts
+// Health:        /api/v1/health       → modules/health/health.route.ts

@@ -47,13 +47,30 @@ export class TasksService {
     ]);
 
     // Dispatch job to BullMQ Queue for asynchronous processing
-    if (queues[QUEUES.DEFAULT]) {
-      await queues[QUEUES.DEFAULT]
-        .add('task:execute', {
-          taskId: task.id,
-          title: task.title,
-          payload: { description: task.description, priority: task.priority },
-        })
+    let targetQueue = queues[QUEUES.DEFAULT];
+    const jobOpts: { delay?: number } = {};
+
+    if (task.scheduledTime) {
+      const delayMs = new Date(task.scheduledTime).getTime() - Date.now();
+      if (delayMs > 0) {
+        jobOpts.delay = delayMs;
+        if (queues[QUEUES.SCHEDULED]) {
+          targetQueue = queues[QUEUES.SCHEDULED];
+        }
+      }
+    }
+
+    if (targetQueue) {
+      await targetQueue
+        .add(
+          'task:execute',
+          {
+            taskId: task.id,
+            title: task.title,
+            payload: { description: task.description, priority: task.priority },
+          },
+          jobOpts
+        )
         .catch((err) => logger.error({ error: err.message }, 'Failed to enqueue task job to BullMQ'));
     }
 
@@ -136,6 +153,16 @@ export class TasksService {
       this.repository.createHistory(id, existing.status, TaskStatus.PENDING, user.id, 'Task requeued for retry'),
       this.repository.createLog(id, 'info', 'Task retry requested. Status set back to PENDING'),
     ]);
+
+    if (queues[QUEUES.DEFAULT]) {
+      await queues[QUEUES.DEFAULT]
+        .add('task:execute', {
+          taskId: existing.id,
+          title: existing.title,
+          payload: { description: existing.description, priority: existing.priority },
+        })
+        .catch((err) => logger.error({ error: err.message }, 'Failed to re-enqueue retry task job to BullMQ'));
+    }
 
     return updated;
   }
