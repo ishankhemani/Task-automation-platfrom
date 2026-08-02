@@ -2,19 +2,33 @@ import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useTheme } from '../../hooks/useTheme.js';
 import { useSocket } from '../../hooks/useSocket.js';
-import { useAppDispatch } from '../../store/index.js';
+import { useAppDispatch, useAppSelector } from '../../store/index.js';
 import { toggleSidebar, toggleMobileSidebar, toggleNotificationDrawer } from '../../store/slices/uiSlice.js';
 import { Menu, Sun, Moon, Bell, LogOut, Search, User as UserIcon, Shield } from 'lucide-react';
 import { StatusBadge } from '../common/StatusBadge.js';
 import { CommandPalette } from '../navigation/CommandPalette.js';
 import { NotificationDrawer } from '../feedback/NotificationDrawer.js';
+import { useQuery } from '@tanstack/react-query';
+import { notificationsApi, Notification } from '../../features/notifications/api/notificationsApi.js';
 
 export function Header() {
   const dispatch = useAppDispatch();
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const { isConnected } = useSocket();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  // Silently poll for unread notification count
+  const { data: notifData } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationsApi.getNotifications(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+    staleTime: 20000,
+  });
+
+  const unreadCount = ((notifData?.data as Notification[]) || []).filter((n) => !n.isRead).length;
 
   const handleMenuToggle = () => {
     if (window.innerWidth < 1024) {
@@ -73,7 +87,13 @@ export function Header() {
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary animate-pulse" />
+            {unreadCount > 0 ? (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            ) : (
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500" />
+            )}
           </button>
 
           {/* Theme Toggle */}
