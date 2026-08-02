@@ -15,6 +15,7 @@
     "build:backend": "npm run build --workspace=apps/backend",
     "build:shared": "npm run build --workspace=packages/shared",
     "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css}\"",
     "docker:up": "docker-compose up -d",
