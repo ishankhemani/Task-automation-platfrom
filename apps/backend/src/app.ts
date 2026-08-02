@@ -64,10 +64,10 @@ app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/queues', queueRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
-// Base route
-app.get('/api/v1/health', (req, res) => {
-  res.status(200).json({ success: true, message: 'Server is healthy', timestamp: new Date().toISOString() });
-});
+import healthRoutes from './modules/health/health.route.js';
+
+// Base route (old health endpoint removed, new modular one added)
+app.use('/api/v1/health', healthRoutes);
 
 // Global Error Handler (must be last)
 app.use(errorHandler);

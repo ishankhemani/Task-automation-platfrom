@@ -7,12 +7,15 @@ import { prisma } from '../database/index.js';
 import { TaskStatus, NotificationType } from '@prisma/client';
 import { CacheService } from '../cache/index.js';
 import { getSocketServer } from '../sockets/socketServer.js';
+import crypto from 'crypto';
 
 const workers: Worker[] = [];
+const WORKER_ID = `worker-${crypto.randomUUID()}`;
 
 async function processJob(job: Job): Promise<unknown> {
   const { taskId, title, payload } = job.data as { taskId: string; title: string; payload?: unknown };
-  logger.info({ jobId: job.id, taskId, queueName: job.queueName }, 'Worker picking up job for execution');
+  const startTime = Date.now();
+  logger.info({ workerId: WORKER_ID, jobId: job.id, taskId, queueName: job.queueName }, 'Worker picking up job for execution');
 
   const io = getSocketServer();
 
@@ -37,7 +40,7 @@ async function processJob(job: Job): Promise<unknown> {
         taskId,
         level: 'info',
         message: `Task execution started on queue ${job.queueName}`,
-        metadata: { jobId: job.id, payload: payload as any },
+        metadata: { jobId: job.id, payload: payload as any, workerId: WORKER_ID },
       },
     }).catch(() => null);
 
@@ -66,6 +69,9 @@ async function processJob(job: Job): Promise<unknown> {
     await new Promise((resolve) => setTimeout(resolve, 500));
     await job.updateProgress(100);
 
+    const executionTime = Date.now() - startTime;
+    logger.info({ workerId: WORKER_ID, jobId: job.id, taskId, queueName: job.queueName, executionTime, status: 'SUCCESS' }, 'Worker job execution completed');
+
     if (taskId) {
       // 2. Set status to COMPLETED
       const task = await prisma.task.update({
@@ -87,7 +93,7 @@ async function processJob(job: Job): Promise<unknown> {
           taskId,
           level: 'info',
           message: 'Task processing completed successfully',
-          metadata: { jobId: job.id },
+          metadata: { jobId: job.id, executionTime },
         },
       });
 
@@ -116,10 +122,12 @@ async function processJob(job: Job): Promise<unknown> {
       });
     }
 
-    return { success: true, processedAt: new Date().toISOString() };
+    return { success: true, processedAt: new Date().toISOString(), executionTime };
   } catch (error) {
+    const executionTime = Date.now() - startTime;
     const errMessage = error instanceof Error ? error.message : 'Unknown execution failure';
-    logger.error({ jobId: job.id, taskId, error: errMessage }, 'Worker job execution failed');
+    const errStack = error instanceof Error ? error.stack : undefined;
+    logger.error({ workerId: WORKER_ID, jobId: job.id, taskId, queueName: job.queueName, error: errMessage, errorStack: errStack, executionTime, status: 'ERROR' }, 'Worker job execution failed');
 
     if (taskId) {
       const task = await prisma.task.findUnique({ where: { id: taskId } }).catch(() => null);
