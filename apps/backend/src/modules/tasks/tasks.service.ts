@@ -171,6 +171,10 @@ export class TasksService {
       throw new ForbiddenError('You do not have permission to retry this task');
     }
 
+    if (existing.status === TaskStatus.PROCESSING) {
+      throw new BadRequestError('Cannot retry a task while it is actively processing');
+    }
+
     const updated = await this.repository.updateTask(id, { status: TaskStatus.PENDING });
     await Promise.all([
       this.repository.createHistory(id, existing.status, TaskStatus.PENDING, user.id, 'Task requeued for retry'),

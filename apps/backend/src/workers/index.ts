@@ -40,7 +40,7 @@ async function processJob(job: Job): Promise<unknown> {
         taskId,
         level: 'info',
         message: `Task execution started on queue ${job.queueName}`,
-        metadata: { jobId: job.id, payload: payload as any, workerId: WORKER_ID },
+        metadata: JSON.parse(JSON.stringify({ jobId: job.id, payload: payload ?? null, workerId: WORKER_ID })),
       },
     }).catch(() => null);
 
@@ -93,7 +93,7 @@ async function processJob(job: Job): Promise<unknown> {
           newStatus: TaskStatus.COMPLETED,
           notes: `Task completed successfully by worker job ${job.id}`,
         },
-      });
+      }).catch(() => null);
 
       await prisma.taskLog.create({
         data: {
@@ -102,7 +102,7 @@ async function processJob(job: Job): Promise<unknown> {
           message: 'Task processing completed successfully',
           metadata: { jobId: job.id, executionTime },
         },
-      });
+      }).catch(() => null);
 
       // Create Notification for creator
       if (task.createdBy) {

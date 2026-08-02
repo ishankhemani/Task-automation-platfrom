@@ -150,6 +150,7 @@ describe('Auth Middleware', () => {
 });
 
 describe('Validate Middleware', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let next: NextFunction;
 
   beforeEach(() => {

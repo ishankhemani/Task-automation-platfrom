@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { Role } from '@prisma/client';
 import { config } from '../../config/index.js';
 import { AuthRepository } from './auth.repository.js';
 import { UnauthorizedError, ConflictError, NotFoundError } from '../../errors/index.js';
@@ -25,7 +26,7 @@ export class AuthService {
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
-      role: (dto.role as any) || 'USER',
+      role: (dto.role as Role) || Role.USER,
     });
 
     logger.info({ userId: user.id, email: user.email }, 'User registered successfully');

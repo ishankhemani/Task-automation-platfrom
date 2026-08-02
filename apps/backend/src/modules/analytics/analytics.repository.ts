@@ -1,5 +1,5 @@
 import { prisma } from '../../database/index.js';
-import { TaskStatus, Priority } from '@prisma/client';
+import { TaskStatus } from '@prisma/client';
 
 export class AnalyticsRepository {
   async getMetrics(days: number = 7) {

@@ -115,8 +115,8 @@ export const storage: StorageStrategy = new LocalStorageStrategy();
  * For production use with multer, install and configure multer separately
  */
 export function validateUpload(
-  allowedTypes: string[] = [...UPLOAD_CONFIG.ALLOWED_MIME_TYPES],
-  maxSize: number = UPLOAD_CONFIG.MAX_FILE_SIZE
+  _allowedTypes: string[] = [...UPLOAD_CONFIG.ALLOWED_MIME_TYPES],
+  _maxSize: number = UPLOAD_CONFIG.MAX_FILE_SIZE
 ) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     const contentType = req.headers['content-type'] || '';
