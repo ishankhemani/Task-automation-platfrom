@@ -8,31 +8,34 @@ interface LineChartWrapperProps {
   color?: string;
 }
 
-export function LineChartWrapper({ data, xKey, yKey, height = 300, color = '#6366f1' }: LineChartWrapperProps) {
+export function LineChartWrapper({ data, xKey, yKey, height = 260, color = '#6366f1' }: LineChartWrapperProps) {
   if (!data || data.length === 0) {
     return (
-      <div style={{ height }} className="flex items-center justify-center border border-dashed rounded-xl text-muted-foreground text-sm">
+      <div style={{ height }} className="flex items-center justify-center border border-dashed rounded-xl text-muted-foreground text-sm w-full">
         No chart data available
       </div>
     );
   }
 
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
-        <XAxis dataKey={xKey} tick={{ fill: 'currentColor', fontSize: 12 }} opacity={0.6} />
-        <YAxis tick={{ fill: 'currentColor', fontSize: 12 }} opacity={0.6} />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: 'hsl(var(--card))',
-            borderColor: 'hsl(var(--border))',
-            borderRadius: '0.5rem',
-            color: 'hsl(var(--foreground))',
-          }}
-        />
-        <Line type="monotone" dataKey={yKey} stroke={color} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="w-full" style={{ height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
+          <XAxis dataKey={xKey} tick={{ fill: 'currentColor', fontSize: 10 }} opacity={0.7} interval="preserveStartEnd" />
+          <YAxis tick={{ fill: 'currentColor', fontSize: 10 }} opacity={0.7} width={35} />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: 'hsl(var(--card))',
+              borderColor: 'hsl(var(--border))',
+              borderRadius: '0.5rem',
+              color: 'hsl(var(--foreground))',
+              fontSize: '0.75rem',
+            }}
+          />
+          <Line type="monotone" dataKey={yKey} stroke={color} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

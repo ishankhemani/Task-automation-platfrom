@@ -73,10 +73,10 @@ export function DataTable<T extends { id?: string | number }>({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full overflow-hidden">
       {/* Search & Action Bar */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative max-w-sm w-full">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="relative w-full sm:max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={searchTerm}
@@ -85,64 +85,66 @@ export function DataTable<T extends { id?: string | number }>({
               setCurrentPage(1);
             }}
             placeholder={searchPlaceholder}
-            className="pl-9"
+            className="pl-9 text-xs sm:text-sm min-h-[44px] sm:min-h-[38px]"
           />
         </div>
       </div>
 
-      {/* Table Container */}
-      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-muted/40">
-            <TableRow>
-              {columns.map((col, index) => (
-                <TableHead key={index}>
-                  {col.sortable ? (
-                    <button
-                      onClick={() => handleSort(index)}
-                      className="flex items-center gap-1.5 hover:text-foreground font-semibold transition-colors"
-                    >
-                      {col.header}
-                      <ArrowUpDown className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <span>{col.header}</span>
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginatedData.length === 0 ? (
+      {/* Table Container with Horizontal Touch Scroll */}
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto w-full -mx-1 sm:mx-0">
+        <div className="min-w-full inline-block align-middle">
+          <Table className="min-w-[600px] w-full">
+            <TableHeader className="bg-muted/40">
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-48 text-center">
-                  <EmptyState
-                    title="No records found"
-                    description="No matching records match your filter criteria."
-                  />
-                </TableCell>
+                {columns.map((col, index) => (
+                  <TableHead key={index} className="px-3 py-3 text-xs font-semibold whitespace-nowrap">
+                    {col.sortable ? (
+                      <button
+                        onClick={() => handleSort(index)}
+                        className="flex items-center gap-1.5 hover:text-foreground font-semibold transition-colors"
+                      >
+                        {col.header}
+                        <ArrowUpDown className="w-3.5 h-3.5" />
+                      </button>
+                    ) : (
+                      <span>{col.header}</span>
+                    )}
+                  </TableHead>
+                ))}
               </TableRow>
-            ) : (
-              paginatedData.map((row, rowIndex) => (
-                <TableRow key={row.id ?? rowIndex}>
-                  {columns.map((col, colIndex) => (
-                    <TableCell key={colIndex}>
-                      {typeof col.accessorKey === 'function'
-                        ? col.accessorKey(row)
-                        : (row[col.accessorKey] as React.ReactNode)}
-                    </TableCell>
-                  ))}
+            </TableHeader>
+            <TableBody>
+              {paginatedData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-48 text-center">
+                    <EmptyState
+                      title="No records found"
+                      description="No matching records match your filter criteria."
+                    />
+                  </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                paginatedData.map((row, rowIndex) => (
+                  <TableRow key={row.id ?? rowIndex} className="hover:bg-muted/30 transition-colors">
+                    {columns.map((col, colIndex) => (
+                      <TableCell key={colIndex} className="px-3 py-3 text-xs sm:text-sm">
+                        {typeof col.accessorKey === 'function'
+                          ? col.accessorKey(row)
+                          : (row[col.accessorKey] as React.ReactNode)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-muted-foreground px-2">
-          <span>
+        <div className="flex flex-col sm:flex-row items-center justify-between text-xs sm:text-sm text-muted-foreground px-1 gap-3">
+          <span className="text-center sm:text-left">
             Page {currentPage} of {totalPages} ({sortedData.length} records)
           </span>
           <div className="flex items-center gap-2">
@@ -151,6 +153,7 @@ export function DataTable<T extends { id?: string | number }>({
               size="sm"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
+              className="min-h-[40px] px-3 text-xs"
             >
               <ChevronLeft className="w-4 h-4 mr-1" /> Previous
             </Button>
@@ -159,6 +162,7 @@ export function DataTable<T extends { id?: string | number }>({
               size="sm"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
+              className="min-h-[40px] px-3 text-xs"
             >
               Next <ChevronRight className="w-4 h-4 ml-1" />
             </Button>

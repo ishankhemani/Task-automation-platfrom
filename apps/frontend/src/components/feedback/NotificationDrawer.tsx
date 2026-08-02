@@ -59,13 +59,13 @@ export function NotificationDrawer() {
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => dispatch(setNotificationDrawerOpen(open))}>
-      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
-        <SheetHeader className="p-6 border-b border-border">
+      <SheetContent side="right" className="w-full max-w-full sm:max-w-md p-0 flex flex-col">
+        <SheetHeader className="p-4 sm:p-6 border-b border-border">
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-primary" />
             <SheetTitle>Notifications</SheetTitle>
           </div>
-          <SheetDescription>Real-time platform activity and job execution alerts</SheetDescription>
+          <SheetDescription className="text-xs sm:text-sm">Real-time platform activity and job execution alerts</SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">

@@ -10,14 +10,14 @@ interface FilterPanelProps {
 
 export function FilterPanel({ title = 'Filters', onReset, children }: FilterPanelProps) {
   return (
-    <div className="p-4 rounded-xl border border-border bg-card/60 backdrop-blur-md space-y-3">
+    <div className="p-3 sm:p-4 rounded-xl border border-border bg-card/60 backdrop-blur-md space-y-3 w-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Filter className="w-4 h-4 text-primary" />
           <span>{title}</span>
         </div>
         {onReset && (
-          <Button variant="ghost" size="sm" onClick={onReset} className="h-7 px-2 text-xs text-muted-foreground">
+          <Button variant="ghost" size="sm" onClick={onReset} className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground">
             <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset
           </Button>
         )}

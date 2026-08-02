@@ -66,16 +66,16 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/60 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-start justify-center pt-6 sm:pt-20 px-2 sm:px-4 bg-black/60 backdrop-blur-sm">
         <motion.div
           variants={modalVariants}
           initial="hidden"
           animate="visible"
           exit="exit"
-          className="w-full max-w-xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden glass-panel"
+          className="w-full max-w-xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden glass-panel max-h-[85vh] flex flex-col"
         >
           {/* Search Header */}
-          <div className="flex items-center px-4 py-3 border-b border-border gap-3">
+          <div className="flex items-center px-3 sm:px-4 py-3 border-b border-border gap-2 sm:gap-3">
             <Search className="w-5 h-5 text-muted-foreground shrink-0" />
             <input
               type="text"
@@ -85,19 +85,19 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                 setSelectedIndex(0);
               }}
               placeholder="Type a command or search..."
-              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-sm focus:outline-none"
+              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground text-sm focus:outline-none min-h-[38px]"
               autoFocus
             />
             <button
               onClick={onClose}
-              className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent/50 min-h-[36px] min-w-[36px] flex items-center justify-center"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Search Results List */}
-          <div className="max-h-80 overflow-y-auto p-2 space-y-1">
+          <div className="max-h-80 overflow-y-auto p-2 space-y-1 flex-1">
             {filteredItems.length === 0 ? (
               <div className="p-8 text-center text-sm text-muted-foreground">
                 No matching commands found.
@@ -114,7 +114,7 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
                       onClose();
                     }}
                     onMouseEnter={() => setSelectedIndex(index)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors text-left ${
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors text-left min-h-[44px] ${
                       isSelected
                         ? 'bg-primary text-primary-foreground font-medium'
                         : 'text-foreground hover:bg-accent/50'
@@ -138,11 +138,12 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
           </div>
 
           {/* Footer Shortcuts */}
-          <div className="flex items-center justify-between px-4 py-2 bg-muted/40 text-xs text-muted-foreground border-t border-border">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-muted/40 text-xs text-muted-foreground border-t border-border">
+            <div className="hidden sm:flex items-center gap-2">
               <span>Navigate: <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">↑</kbd> <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">↓</kbd></span>
               <span>Select: <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">↵</kbd></span>
             </div>
+            <span className="sm:hidden text-[11px]">Tap command to launch</span>
             <span>Close: <kbd className="px-1.5 py-0.5 rounded bg-background border border-border">ESC</kbd></span>
           </div>
         </motion.div>

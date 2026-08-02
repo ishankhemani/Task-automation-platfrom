@@ -90,7 +90,7 @@ export function DashboardPage() {
       />
 
       {/* Metrics Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           title="Total Tasks Executed"
           value={stats.totalTasks.toString()}
@@ -126,38 +126,38 @@ export function DashboardPage() {
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <GlassCard>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
-              <h3 className="text-base font-semibold text-foreground">Task Throughput Volume</h3>
+              <h3 className="text-sm sm:text-base font-semibold text-foreground">Task Throughput Volume</h3>
               <p className="text-xs text-muted-foreground">Execution density across 24 hour timeline</p>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-medium">
+            <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-medium self-start sm:self-auto">
               Live Feed
             </span>
           </div>
-          <AreaChartWrapper data={chartData} xKey="time" yKey="tasks" color="#3b82f6" height={250} />
+          <AreaChartWrapper data={chartData} xKey="time" yKey="tasks" color="#3b82f6" height={220} />
         </GlassCard>
 
         <GlassCard>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
             <div>
-              <h3 className="text-base font-semibold text-foreground">Processing Latency</h3>
+              <h3 className="text-sm sm:text-base font-semibold text-foreground">Processing Latency</h3>
               <p className="text-xs text-muted-foreground">Execution latency in milliseconds</p>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium">
+            <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-medium self-start sm:self-auto">
               ~{stats.avgProcessingTimeMs}ms
             </span>
           </div>
-          <BarChartWrapper data={chartData} xKey="time" yKey="latency" color="#10b981" height={250} />
+          <BarChartWrapper data={chartData} xKey="time" yKey="latency" color="#10b981" height={220} />
         </GlassCard>
       </div>
 
       {/* Recent Queue Operations */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-foreground">Recent Task Queue Operations</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <h3 className="text-base sm:text-lg font-bold text-foreground">Recent Task Queue Operations</h3>
           <span className="text-xs text-muted-foreground">Live feed from PostgreSQL & Redis</span>
         </div>
         <DataTable
