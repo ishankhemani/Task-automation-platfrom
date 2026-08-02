@@ -17,6 +17,7 @@ const registerValidationSchema = z
   .object({
     name: z.string().min(2, 'Full name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email address'),
+    role: z.nativeEnum(UserRole),
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters')
@@ -50,6 +51,7 @@ export function RegisterForm() {
     defaultValues: {
       name: '',
       email: '',
+      role: UserRole.USER,
       password: '',
       confirmPassword: '',
       termsAccepted: false as unknown as true,
@@ -72,7 +74,7 @@ export function RegisterForm() {
         name: data.name,
         email: data.email,
         password: data.password,
-        role: UserRole.USER,
+        role: data.role,
       });
     } catch {
       // Handled by onError toast callback
@@ -109,6 +111,18 @@ export function RegisterForm() {
             className="pl-9 min-h-[44px]"
           />
         </div>
+      </FormFieldWrapper>
+
+      {/* Role Selection */}
+      <FormFieldWrapper label="Account Role & Authorization Level" required>
+        <select
+          {...register('role')}
+          className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none min-h-[44px]"
+        >
+          <option value={UserRole.USER}>Standard User (Workspace Task Automation)</option>
+          <option value={UserRole.ADMIN}>Administrator (Full System, User & Worker Node Access)</option>
+          <option value={UserRole.VIEWER}>Viewer (Read-Only Telemetry Access)</option>
+        </select>
       </FormFieldWrapper>
 
       {/* Password Input */}

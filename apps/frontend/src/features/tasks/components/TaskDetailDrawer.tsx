@@ -1,9 +1,23 @@
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useTaskDetail, useTaskMutations } from '../hooks/useTaskQueries.js';
 import { TaskStatusBadge, PriorityBadge } from './TaskStatusBadge.js';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../../components/ui/dialog.js';
 import { Button } from '../../../components/ui/button.js';
+import { Input } from '../../../components/ui/input.js';
+import { Textarea } from '../../../components/ui/textarea.js';
+import { FormFieldWrapper } from '../../../components/forms/FormFieldWrapper.js';
 import { LoadingSpinner } from '../../../components/common/LoadingSpinner.js';
-import { Clock, History, FileText, Paperclip, RotateCcw, Ban, Copy, Trash2 } from 'lucide-react';
+import { Clock, History, FileText, Paperclip, RotateCcw, Ban, Copy, Trash2, Edit2 } from 'lucide-react';
+
+const editTaskSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  description: z.string().max(2000).optional(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
+});
+type EditTaskForm = z.infer<typeof editTaskSchema>;
 
 interface TaskDetailDrawerProps {
   taskId: string | null;
@@ -12,8 +26,25 @@ interface TaskDetailDrawerProps {
 
 export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
   const { data: task, isLoading } = useTaskDetail(taskId || undefined);
-  const { cancelTask, isCancelling, retryTask, isRetrying, duplicateTask, isDuplicating, deleteTask, isDeleting } =
+  const { cancelTask, isCancelling, retryTask, isRetrying, duplicateTask, isDuplicating, deleteTask, isDeleting, updateTask, isUpdating } =
     useTaskMutations();
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const editForm = useForm<EditTaskForm>({
+    resolver: zodResolver(editTaskSchema),
+    defaultValues: { title: '', description: '', priority: 'MEDIUM' },
+  });
+
+  useEffect(() => {
+    if (task) {
+      editForm.reset({
+        title: task.title,
+        description: task.description || '',
+        priority: task.priority,
+      });
+    }
+  }, [task]);
 
   if (!taskId) return null;
 
@@ -138,7 +169,50 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
               >
                 <Trash2 className="w-3.5 h-3.5 mr-1" /> Delete
               </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+                className={isEditing ? 'border-primary text-primary' : ''}
+              >
+                <Edit2 className="w-3.5 h-3.5 mr-1" /> {isEditing ? 'Cancel Edit' : 'Edit Task'}
+              </Button>
             </div>
+
+            {/* Inline Edit Form */}
+            {isEditing && (
+              <form
+                onSubmit={editForm.handleSubmit(async (data) => {
+                  await updateTask({ id: task.id, data });
+                  setIsEditing(false);
+                })}
+                className="p-4 rounded-lg border border-primary/30 bg-primary/5 space-y-3"
+              >
+                <h4 className="text-sm font-semibold text-foreground">Edit Task Details</h4>
+                <FormFieldWrapper label="Title" error={editForm.formState.errors.title?.message} required>
+                  <Input {...editForm.register('title')} className="text-sm" />
+                </FormFieldWrapper>
+                <FormFieldWrapper label="Description" error={editForm.formState.errors.description?.message}>
+                  <Textarea {...editForm.register('description')} rows={2} className="text-sm" />
+                </FormFieldWrapper>
+                <FormFieldWrapper label="Priority">
+                  <select
+                    {...editForm.register('priority')}
+                    className="w-full px-3 py-2 text-sm rounded-md bg-background border border-border focus:ring-1 focus:ring-primary outline-none"
+                  >
+                    <option value="LOW">LOW</option>
+                    <option value="MEDIUM">MEDIUM</option>
+                    <option value="HIGH">HIGH</option>
+                    <option value="CRITICAL">CRITICAL</option>
+                  </select>
+                </FormFieldWrapper>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
+                  <Button type="submit" size="sm" isLoading={isUpdating}>Save Changes</Button>
+                </div>
+              </form>
+            )}
 
             {/* History Timeline */}
             <div className="space-y-2">

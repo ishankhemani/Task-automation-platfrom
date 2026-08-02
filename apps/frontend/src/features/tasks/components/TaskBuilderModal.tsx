@@ -17,6 +17,7 @@ const createTaskValidationSchema = z.object({
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
   scheduledTime: z.string().optional(),
   attachment: z.string().optional(),
+  assignedTo: z.string().optional(),
 });
 
 type CreateTaskFormType = z.infer<typeof createTaskValidationSchema>;
@@ -43,6 +44,7 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
       priority: 'MEDIUM',
       scheduledTime: '',
       attachment: '',
+      assignedTo: '',
     },
   });
 
@@ -54,6 +56,7 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
         priority: data.priority as Priority,
         scheduledTime: data.scheduledTime || undefined,
         attachment: data.attachment || undefined,
+        assignedTo: data.assignedTo || undefined,
       });
       reset();
       onClose();
@@ -76,7 +79,7 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
           <FormFieldWrapper label="Task Title" error={errors.title?.message} required>
-            <Input {...register('title')} placeholder="e.g. Daily Data Export & Sync" error={!!errors.title} />
+            <Input {...register('title')} placeholder="e.g. Financial Analytics ETL Pipeline" error={!!errors.title} />
           </FormFieldWrapper>
 
           <FormFieldWrapper label="Description" error={errors.description?.message}>
@@ -102,6 +105,10 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
 
             <FormFieldWrapper label="Scheduled Time">
               <Input {...register('scheduledTime')} type="datetime-local" className="text-xs min-h-[40px] sm:min-h-[38px]" />
+            </FormFieldWrapper>
+
+            <FormFieldWrapper label="Assign To (User ID)" error={errors.assignedTo?.message}>
+              <Input {...register('assignedTo')} placeholder="Optional: paste user UUID to assign task" className="text-xs min-h-[38px]" />
             </FormFieldWrapper>
           </div>
 

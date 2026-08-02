@@ -5,7 +5,7 @@ import { StatCard } from '../../../components/data-display/StatCard.js';
 import { GlassCard } from '../../../components/data-display/GlassCard.js';
 import { DataTable } from '../../../components/data-display/DataTable.js';
 import { StatusBadge } from '../../../components/common/StatusBadge.js';
-import { Cpu, Layers, Activity, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Layers, Activity, CheckCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '../../../components/ui/button.js';
 import { showSuccess } from '../../../lib/toast.js';
 
@@ -74,7 +74,7 @@ export function QueuesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Queue & Worker Monitoring"
-        description="Real-time BullMQ background job queues & Redis worker node cluster status"
+        description="Distributed queue depth analytics and background worker cluster telemetry"
         breadcrumbs={[{ label: 'Platform', href: '#' }, { label: 'Queue Monitoring' }]}
         actions={
           <Button
@@ -114,7 +114,7 @@ export function QueuesPage() {
           change="Success"
           trend="up"
           icon={<CheckCircle className="w-5 h-5" />}
-          description="Processed with 0 errors"
+          description="Processed without execution errors"
         />
         <StatCard
           title="Failed Jobs"
@@ -130,7 +130,7 @@ export function QueuesPage() {
       <GlassCard className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-foreground">BullMQ Queue Status</h3>
+            <h3 className="text-sm sm:text-base font-bold text-foreground">Pipeline Queue Status</h3>
             <p className="text-xs text-muted-foreground">Live depth metrics across isolated queue pipelines</p>
           </div>
         </div>
@@ -141,11 +141,11 @@ export function QueuesPage() {
       <GlassCard className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-foreground">Worker Node Cluster Health</h3>
-            <p className="text-xs text-muted-foreground">Active background thread workers connected to Redis</p>
+            <h3 className="text-sm sm:text-base font-bold text-foreground">Worker Cluster Topology</h3>
+            <p className="text-xs text-muted-foreground">Active execution threads in worker pool</p>
           </div>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-semibold flex items-center gap-1 self-start sm:self-auto">
-            <Cpu className="w-3.5 h-3.5" /> Cluster Healthy
+          <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-semibold flex items-center gap-1.5 self-start sm:self-auto">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Cluster Operational
           </span>
         </div>
         <DataTable data={workerStats} columns={workerColumns} isLoading={isWorkerLoading} />

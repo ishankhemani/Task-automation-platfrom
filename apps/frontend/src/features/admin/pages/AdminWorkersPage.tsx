@@ -54,7 +54,7 @@ export const AdminWorkersPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Worker Node & Queue Monitor</h1>
-          <p className="text-sm text-muted-foreground">Real-time status of distributed BullMQ worker processes, CPU/Memory resource utilization, and queue controls.</p>
+          <p className="text-sm text-muted-foreground">Real-time telemetry for distributed worker processes, system resource utilization, and queue cluster management.</p>
         </div>
 
         <button
@@ -118,8 +118,8 @@ export const AdminWorkersPage: React.FC = () => {
           <div className="text-2xl font-bold text-foreground">
             {stats?.workers?.length || 4} Node Processes
           </div>
-          <p className="text-xs text-emerald-500 flex items-center gap-1 font-medium">
-            ● All workers healthy
+          <p className="text-xs text-emerald-500 flex items-center gap-1.5 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> All worker nodes operational
           </p>
         </div>
 
@@ -131,7 +131,7 @@ export const AdminWorkersPage: React.FC = () => {
           <div className="text-2xl font-bold text-foreground">
             {(stats?.queues || []).reduce((acc, q) => acc + q.active + q.waiting + q.completed, 0)}
           </div>
-          <p className="text-xs text-muted-foreground">Across all BullMQ Queues</p>
+          <p className="text-xs text-muted-foreground">Across all job queues</p>
         </div>
       </div>
 

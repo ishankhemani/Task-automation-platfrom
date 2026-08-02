@@ -1,16 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../../hooks/useTheme.js';
-import { Sun, Moon, Monitor, Bell, Radio, CheckCircle, Database, Cpu, Volume2, VolumeX } from 'lucide-react';
+import { Sun, Moon, Monitor, Bell, Radio, CheckCircle, Database, Cpu, Volume2, VolumeX, Save } from 'lucide-react';
 import { toast } from 'sonner';
+
+const PREFS_KEY = 'taskplatform:settings';
+
+interface UserPrefs {
+  notificationsEnabled: boolean;
+  soundEnabled: boolean;
+  autoRefresh: boolean;
+}
+
+function loadPrefs(): UserPrefs {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (raw) return JSON.parse(raw) as UserPrefs;
+  } catch {}
+  return { notificationsEnabled: true, soundEnabled: true, autoRefresh: true };
+}
 
 export const SettingsPage: React.FC = () => {
   const { theme, setTheme } = useTheme();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => loadPrefs().notificationsEnabled);
+  const [soundEnabled, setSoundEnabled] = useState(() => loadPrefs().soundEnabled);
+  const [autoRefresh, setAutoRefresh] = useState(() => loadPrefs().autoRefresh);
+  const [saved, setSaved] = useState(false);
+
+  // Persist to localStorage whenever any preference changes
+  useEffect(() => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ notificationsEnabled, soundEnabled, autoRefresh }));
+  }, [notificationsEnabled, soundEnabled, autoRefresh]);
 
   const handleSavePreferences = () => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ notificationsEnabled, soundEnabled, autoRefresh }));
+    setSaved(true);
     toast.success('System preferences saved successfully!');
+    setTimeout(() => setSaved(false), 2000);
   };
 
   return (
@@ -169,9 +194,14 @@ export const SettingsPage: React.FC = () => {
         <button
           type="button"
           onClick={handleSavePreferences}
-          className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm"
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-sm ${
+            saved
+              ? 'bg-emerald-500 text-white'
+              : 'bg-primary text-primary-foreground hover:bg-primary/90'
+          }`}
         >
-          Save Preferences
+          {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+          {saved ? 'Saved!' : 'Save Preferences'}
         </button>
       </div>
     </div>
