@@ -6,10 +6,11 @@ import { AuthRepository } from './auth.repository.js';
 import { UnauthorizedError, ConflictError, NotFoundError } from '../../errors/index.js';
 import { AUTH_CONSTANTS, AUTH_MESSAGES } from './auth.constants.js';
 import { logger } from '../../utils/index.js';
+import { CacheService } from '../../cache/index.js';
 import type { RegisterDTO, LoginDTO, ForgotPasswordDTO, ResetPasswordDTO, ChangePasswordDTO } from './auth.dto.js';
 
-// In-memory store for password reset tokens (production should use Redis or DB)
-const passwordResetTokens = new Map<string, { userId: string; expiresAt: Date }>();
+// Redis key prefix for password reset tokens
+const PWD_RESET_PREFIX = 'pwd_reset:';
 
 export class AuthService {
   static async register(dto: RegisterDTO, ipAddress?: string, userAgent?: string) {
@@ -24,6 +25,7 @@ export class AuthService {
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
+      role: (dto.role as any) || 'USER',
     });
 
     logger.info({ userId: user.id, email: user.email }, 'User registered successfully');
@@ -180,11 +182,9 @@ export class AuthService {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    // Store reset token
-    passwordResetTokens.set(hashedToken, {
-      userId: user.id,
-      expiresAt: new Date(Date.now() + AUTH_CONSTANTS.PASSWORD_RESET_EXPIRY_MS),
-    });
+    // Store reset token in Redis with TTL (production-safe, survives restarts & scales)
+    const ttlSeconds = Math.floor(AUTH_CONSTANTS.PASSWORD_RESET_EXPIRY_MS / 1000);
+    await CacheService.set(`${PWD_RESET_PREFIX}${hashedToken}`, { userId: user.id }, ttlSeconds);
 
     logger.info({ userId: user.id, email: dto.email }, 'Password reset token generated');
 
@@ -196,25 +196,28 @@ export class AuthService {
       entityId: user.id,
     });
 
-    // In production, send email with resetToken
-    // For now, return the token (development only)
-    return { resetToken };
+    // In production: send email with link containing resetToken
+    // e.g. https://yourapp.com/reset-password?token=<resetToken>
+    // For development: token is logged server-side only (not exposed in API response)
+    logger.info({ resetToken }, '[DEV] Password reset token (wire up email provider for production)');
+
+    return { message: 'If this email is registered, a password reset link has been sent.' };
   }
 
   static async resetPassword(dto: ResetPasswordDTO) {
     const hashedToken = crypto.createHash('sha256').update(dto.token).digest('hex');
-    const resetData = passwordResetTokens.get(hashedToken);
+    const resetData = await CacheService.get<{ userId: string }>(`${PWD_RESET_PREFIX}${hashedToken}`);
 
-    if (!resetData || resetData.expiresAt < new Date()) {
-      passwordResetTokens.delete(hashedToken);
+    if (!resetData) {
+      // Token not found or already expired (Redis TTL handled expiry automatically)
       throw new UnauthorizedError(AUTH_MESSAGES.INVALID_TOKEN);
     }
 
     const hashedPassword = await bcrypt.hash(dto.newPassword, AUTH_CONSTANTS.SALT_ROUNDS);
     await AuthRepository.updateUserPassword(resetData.userId, hashedPassword);
 
-    // Clean up the used token
-    passwordResetTokens.delete(hashedToken);
+    // Clean up the used token from Redis (prevent token reuse)
+    await CacheService.delete(`${PWD_RESET_PREFIX}${hashedToken}`);
 
     // Revoke all existing refresh tokens for security
     await AuthRepository.revokeAllUserTokens(resetData.userId);

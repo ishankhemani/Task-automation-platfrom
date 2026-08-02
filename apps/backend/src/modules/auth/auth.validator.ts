@@ -6,6 +6,7 @@ export const registerSchema = z.object({
     name: z.string().min(2, 'Name must be at least 2 characters').max(AUTH_CONSTANTS.MAX_NAME_LENGTH),
     email: z.string().email('Invalid email address'),
     password: z.string().min(AUTH_CONSTANTS.MIN_PASSWORD_LENGTH, `Password must be at least ${AUTH_CONSTANTS.MIN_PASSWORD_LENGTH} characters`),
+    role: z.enum(['ADMIN', 'USER', 'VIEWER']).optional(),
   }),
 });
 

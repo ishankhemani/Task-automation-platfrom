@@ -35,7 +35,7 @@ export class AdminService {
         activeJobs: qStat?.active || 0,
         completedJobs: qStat?.completed || 0,
         failedJobs: qStat?.failed || 0,
-        cpuUsage: Math.min(100, Math.round((cpuLoad / cpuCount) * 100) || 12 + index * 4),
+        cpuUsage: Math.min(100, Math.round((cpuLoad / cpuCount) * 100)),
         memoryUsage: memoryPercentage,
         lastHeartbeat: new Date().toISOString(),
       };

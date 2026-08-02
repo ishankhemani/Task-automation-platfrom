@@ -6,6 +6,27 @@ import { queues } from '../../queues/queueManager.js';
 import { QUEUES } from '@task-platform/shared';
 import { logger } from '../../utils/index.js';
 
+/** Remove any waiting/delayed BullMQ jobs that belong to a given taskId across all queues */
+async function removeBullMQJobForTask(taskId: string): Promise<void> {
+  for (const queue of Object.values(queues)) {
+    try {
+      // Get waiting and delayed jobs (the only ones that can still be cancelled)
+      const [waiting, delayed] = await Promise.all([
+        queue.getJobs(['waiting']),
+        queue.getJobs(['delayed']),
+      ]);
+      for (const job of [...waiting, ...delayed]) {
+        if (job.data?.taskId === taskId) {
+          await job.remove();
+          logger.info({ taskId, jobId: job.id, queueName: queue.name }, 'Removed BullMQ job on task cancel');
+        }
+      }
+    } catch (err) {
+      logger.warn({ taskId, error: (err as Error).message }, 'Failed to remove BullMQ job on cancel — job may have already started');
+    }
+  }
+}
+
 export class TasksService {
   private repository: TasksRepository;
 
@@ -133,6 +154,8 @@ export class TasksService {
     await Promise.all([
       this.repository.createHistory(id, existing.status, TaskStatus.CANCELLED, user.id, 'Task cancelled by user'),
       this.repository.createLog(id, 'warn', 'Task execution cancelled'),
+      // Remove the pending/delayed BullMQ job so the worker never picks it up
+      removeBullMQJobForTask(id),
     ]);
 
     return updated;
