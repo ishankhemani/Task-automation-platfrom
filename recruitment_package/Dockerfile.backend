@@ -1,0 +1,61 @@
+# Multi-stage Dockerfile for Node.js Backend & BullMQ Worker
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install OpenSSL and build utilities for Alpine musl architecture
+RUN apk add --no-cache openssl libc6-compat
+
+# Copy root workspace configs
+COPY package*.json tsconfig.base.json ./
+COPY packages/shared/package*.json ./packages/shared/
+COPY apps/backend/package*.json ./apps/backend/
+COPY apps/backend/prisma ./apps/backend/prisma/
+
+# Install dependencies (requires devDeps for building)
+RUN npm ci
+
+# Copy source files
+COPY packages/shared ./packages/shared
+COPY apps/backend ./apps/backend
+
+# Generate Prisma Client & Build
+RUN npm run prisma:generate
+RUN npm run build:shared
+RUN npm run build:backend
+
+# Production Runner Stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Install OpenSSL, libc6-compat, and curl for Prisma runtime and healthchecks
+RUN apk add --no-cache openssl libc6-compat curl
+
+# Create uploads directory with correct permissions for non-root user
+RUN mkdir -p /app/uploads && chown -R node:node /app
+USER node
+
+# Copy configs
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node packages/shared/package*.json ./packages/shared/
+COPY --chown=node:node apps/backend/package*.json ./apps/backend/
+
+# Install production dependencies only
+RUN npm ci --omit=dev --ignore-scripts
+
+# Copy built assets
+COPY --from=builder --chown=node:node /app/packages/shared/dist ./packages/shared/dist
+COPY --from=builder --chown=node:node /app/apps/backend/dist ./apps/backend/dist
+COPY --from=builder --chown=node:node /app/apps/backend/prisma ./apps/backend/prisma
+COPY --from=builder --chown=node:node /app/apps/backend/prisma ./prisma
+COPY --from=builder --chown=node:node /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
+
+EXPOSE 4000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:4000/api/v1/health/ready || exit 1
+
+CMD ["node", "apps/backend/dist/server.js"]

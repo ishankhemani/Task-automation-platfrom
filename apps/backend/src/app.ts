@@ -23,7 +23,19 @@ const app = express();
 // Security Middlewares
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'blob:', 'http:', 'https:'],
+        connectSrc: ["'self'", 'http:', 'https:', 'ws:', 'wss:'],
+        fontSrc: ["'self'", 'http:', 'https:', 'data:'],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameAncestors: ["'self'"],
+      },
+    },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 );
