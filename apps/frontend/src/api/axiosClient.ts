@@ -66,6 +66,11 @@ axiosClient.interceptors.response.use(
         return Promise.reject(error);
       }
 
+      // Don't try to refresh tokens for static file routes like /uploads
+      if (originalRequest.url?.startsWith('/uploads')) {
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         // Queue parallel requests while refresh is in flight
         return new Promise((resolve, reject) => {
@@ -84,14 +89,19 @@ axiosClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const storedRefreshToken = localStorage.getItem('refreshToken');
         // Execute refresh token request
-        const refreshResponse = await axios.post<ApiResponse<{ accessToken: string }>>(
+        const refreshResponse = await axios.post<ApiResponse<{ accessToken: string; refreshToken?: string }>>(
           `${env.VITE_API_BASE_URL}/auth/refresh-token`,
-          {},
+          { refreshToken: storedRefreshToken || undefined },
           { withCredentials: true }
         );
 
         const newAccessToken = refreshResponse.data?.data?.accessToken;
+        const newRefreshToken = refreshResponse.data?.data?.refreshToken;
+        if (newRefreshToken) {
+          localStorage.setItem('refreshToken', newRefreshToken);
+        }
 
         if (newAccessToken && storeRef) {
           storeRef.dispatch({
@@ -115,6 +125,9 @@ axiosClient.interceptors.response.use(
         }
         return Promise.reject(refreshErr);
       } finally {
+        // Always reset the flag — even if an exception is thrown.
+        // Without this, isRefreshing stays true and all subsequent
+        // requests queue indefinitely, causing apparent "logout".
         isRefreshing = false;
       }
     }

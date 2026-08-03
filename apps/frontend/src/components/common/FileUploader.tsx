@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 interface FileUploaderProps {
   onUploadSuccess?: (fileUrl: string, uploadMeta: UploadResult['upload']) => void;
+  onClear?: () => void;
   allowedTypes?: string[];
   maxSizeMB?: number;
   currentValue?: string;
@@ -14,6 +15,7 @@ interface FileUploaderProps {
 
 export const FileUploader: React.FC<FileUploaderProps> = ({
   onUploadSuccess,
+  onClear,
   allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'],
   maxSizeMB = 10,
   currentValue,
@@ -31,7 +33,13 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   const validateAndUpload = async (file: File) => {
     setErrorMsg(null);
 
-    if (!allowedTypes.includes(file.type)) {
+    const fileType = (file.type || '').toLowerCase();
+    const fileName = (file.name || '').toLowerCase();
+    const isImage = fileType.startsWith('image/');
+    const isPdf = fileType === 'application/pdf';
+    const isAllowedExt = /\.(jpe?g|png|gif|webp|pdf|svg|bmp|avif)$/i.test(fileName);
+
+    if (!isImage && !isPdf && !isAllowedExt && !allowedTypes.includes(file.type)) {
       const err = `Unsupported file type: ${file.type || 'unknown'}. Allowed: Images, PDF.`;
       setErrorMsg(err);
       toast.error(err);
@@ -103,6 +111,9 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    if (onClear) {
+      onClear();
+    }
   };
 
   const isImage = (url?: string | null, mime?: string | null) => {
@@ -152,7 +163,15 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
           <div className="flex items-center gap-2">
             <a
-              href={uploadedUrl}
+              href={
+                /^https?:\/\//i.test(uploadedUrl)
+                  ? uploadedUrl
+                  : uploadedUrl.startsWith('/uploads/')
+                    ? uploadedUrl
+                    : uploadedUrl.startsWith('/')
+                      ? uploadedUrl
+                      : `/uploads/${uploadedUrl}`
+              }
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-primary hover:underline px-2 py-1 rounded bg-primary/10"

@@ -29,10 +29,10 @@ export const AdminLogsPage: React.FC = () => {
     enabled: tab === 'activity',
   });
 
-  const systemLogs = systemLogsResponse?.data?.data || [];
+  const systemLogs = Array.isArray(systemLogsResponse?.data?.data) ? systemLogsResponse.data.data : [];
   const systemMeta = systemLogsResponse?.data?.meta || { page: 1, limit: 15, total: 0, totalPages: 1 };
 
-  const activityLogs = activityLogsResponse?.data?.data || [];
+  const activityLogs = Array.isArray(activityLogsResponse?.data?.data) ? activityLogsResponse.data.data : [];
   const activityMeta = activityLogsResponse?.data?.meta || { page: 1, limit: 15, total: 0, totalPages: 1 };
 
   const handleExportCSV = () => {
@@ -326,3 +326,5 @@ export const AdminLogsPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminLogsPage;

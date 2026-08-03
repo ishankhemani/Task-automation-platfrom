@@ -34,7 +34,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const socketInstance = io(env.VITE_SOCKET_URL, {
+    const socketInstance = io(env.VITE_SOCKET_URL || undefined, {
       auth: {
         token: accessToken,
       },

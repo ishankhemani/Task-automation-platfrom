@@ -33,7 +33,16 @@ const startServer = async () => {
   try {
     await connectDB();
     initializeQueues();
-    setupWorker();
+
+    if (config.isWorker) {
+      setupWorker();
+      logger.info(`⚙️ Background Worker Node running in ${config.env} mode`);
+      return;
+    }
+
+    if (config.isDevelopment) {
+      setupWorker();
+    }
 
     server.listen(config.port, () => {
       logger.info(`🚀 Server running in ${config.env} mode on port ${config.port}`);

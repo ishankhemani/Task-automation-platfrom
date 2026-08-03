@@ -9,7 +9,8 @@ export function useTasks(params: TasksListQueryParams) {
     queryKey: ['tasks', params],
     queryFn: async () => {
       const response = await tasksApi.getTasks(params);
-      return response;
+      // Unwrap envelope — consistent with all other hooks in this project
+      return response.data ?? null;
     },
   });
 }

@@ -28,7 +28,9 @@ export function Header() {
     staleTime: 20000,
   });
 
-  const unreadCount = ((notifData?.data as Notification[]) || []).filter((n) => !n.isRead).length;
+  const unreadCount = Array.isArray(notifData?.data)
+    ? (notifData.data as Notification[]).filter((n) => !n?.isRead).length
+    : 0;
 
   const handleMenuToggle = () => {
     if (window.innerWidth < 1024) {

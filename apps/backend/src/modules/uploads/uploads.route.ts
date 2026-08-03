@@ -25,18 +25,17 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter: multer.Options['fileFilter'] = (_req, file, cb) => {
-  const allowedTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'application/pdf',
-  ];
+  const mime = (file.mimetype || '').toLowerCase();
+  const ext = path.extname(file.originalname || '').toLowerCase();
 
-  if (allowedTypes.includes(file.mimetype)) {
+  const isImageMime = mime.startsWith('image/');
+  const isPdfMime = mime === 'application/pdf';
+  const isAllowedExt = /\.(jpe?g|png|gif|webp|pdf|svg|bmp|tiff|avif)$/i.test(ext);
+
+  if (isImageMime || isPdfMime || isAllowedExt) {
     cb(null, true);
   } else {
-    cb(new AppError('Invalid file type. Only Images (JPEG, PNG, GIF, WEBP) and PDFs are allowed.', 400));
+    cb(new AppError('Invalid file type. Only Images (JPEG, JPG, PNG, GIF, WEBP, SVG) and PDFs are allowed.', 400));
   }
 };
 

@@ -37,7 +37,15 @@ function sanitizeValue(value: unknown): unknown {
  */
 export function sanitizeInput(req: Request, _res: Response, next: NextFunction): void {
   if (req.body && typeof req.body === 'object') {
-    req.body = sanitizeValue(req.body);
+    const { password, confirmPassword, newPassword, currentPassword, ...rest } = req.body;
+    const sanitizedRest = sanitizeValue(rest) as Record<string, unknown>;
+    req.body = {
+      ...sanitizedRest,
+      ...(password !== undefined && { password }),
+      ...(confirmPassword !== undefined && { confirmPassword }),
+      ...(newPassword !== undefined && { newPassword }),
+      ...(currentPassword !== undefined && { currentPassword }),
+    };
   }
 
   if (req.query && typeof req.query === 'object') {

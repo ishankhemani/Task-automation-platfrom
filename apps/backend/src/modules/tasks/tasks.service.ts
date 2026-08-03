@@ -35,11 +35,7 @@ export class TasksService {
   }
 
   async getTasks(query: TasksListQueryDTO, user: { id: string; role: Role }) {
-    // Non-admin users only see tasks they created or were assigned to, unless explicitly requesting
-    if (user.role !== Role.ADMIN && !query.createdBy) {
-      query.createdBy = user.id;
-    }
-    return this.repository.findManyWithFilters(query);
+    return this.repository.findManyWithFilters(query, user);
   }
 
   async getTaskById(id: string, user: { id: string; role: Role }) {
@@ -56,8 +52,12 @@ export class TasksService {
   }
 
   async createTask(data: CreateTaskDTO, user: { id: string; role: Role }) {
+    // Only ADMIN can assign tasks to other users
+    const assignedTo = user.role === Role.ADMIN ? data.assignedTo : undefined;
+
     const task = await this.repository.createTask({
       ...data,
+      assignedTo,
       createdBy: user.id,
     });
 
@@ -108,8 +108,13 @@ export class TasksService {
       throw new ForbiddenError('You do not have permission to update this task');
     }
 
+    const updateData = { ...data };
+    if (user.role !== Role.ADMIN) {
+      delete updateData.assignedTo;
+    }
+
     const oldStatus = existing.status;
-    const updated = await this.repository.updateTask(id, data);
+    const updated = await this.repository.updateTask(id, updateData);
 
     // Track status change if modified
     if (data.status && data.status !== oldStatus) {

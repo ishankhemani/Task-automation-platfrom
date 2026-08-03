@@ -2,8 +2,10 @@ import { prisma } from '../../database/index.js';
 import { Prisma, TaskStatus, Priority } from '@prisma/client';
 import { TasksListQueryDTO, CreateTaskDTO, UpdateTaskDTO } from './tasks.dto.js';
 
+import { Role } from '@prisma/client';
+
 export class TasksRepository {
-  async findManyWithFilters(query: TasksListQueryDTO) {
+  async findManyWithFilters(query: TasksListQueryDTO, user?: { id: string; role: Role }) {
     const page = Math.max(1, Number(query.page) || 1);
     const limit = Math.min(100, Math.max(1, Number(query.limit) || 10));
     const skip = (page - 1) * limit;
@@ -33,6 +35,19 @@ export class TasksRepository {
 
     if (query.createdBy) {
       where.createdBy = query.createdBy;
+    }
+
+    // For non-admin users where no specific createdBy/assignedTo query filter was requested,
+    // show tasks created by OR assigned to the user so tasks don't vanish
+    if (user && user.role !== Role.ADMIN && !query.createdBy && !query.assignedTo) {
+      where.AND = [
+        {
+          OR: [
+            { createdBy: user.id },
+            { assignedTo: user.id },
+          ],
+        },
+      ];
     }
 
     const sortBy = query.sortBy || 'createdAt';

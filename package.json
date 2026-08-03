@@ -32,6 +32,9 @@
     "prettier": "^3.2.5",
     "typescript": "^5.4.0"
   },
+  "prisma": {
+    "schema": "apps/backend/prisma/schema.prisma"
+  },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"

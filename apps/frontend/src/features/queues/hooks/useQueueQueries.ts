@@ -1,30 +1,32 @@
 import { useQuery } from '@tanstack/react-query';
 import { queuesApi } from '../api/queuesApi.js';
+import { IQueueStats } from '@task-platform/shared';
+import { WorkerNodeStats } from '../api/queuesApi.js';
 
 export function useQueueQueries() {
   const queueStatsQuery = useQuery({
     queryKey: ['queues', 'stats'],
-    queryFn: async () => {
+    queryFn: async (): Promise<IQueueStats[]> => {
       const res = await queuesApi.getStats();
-      return res.data || [];
+      return Array.isArray(res?.data) ? res.data : [];
     },
     refetchInterval: 5000,
   });
 
   const workerStatsQuery = useQuery({
     queryKey: ['queues', 'workers'],
-    queryFn: async () => {
+    queryFn: async (): Promise<WorkerNodeStats[]> => {
       const res = await queuesApi.getWorkers();
-      return res.data || [];
+      return Array.isArray(res?.data) ? res.data : [];
     },
     refetchInterval: 10000,
   });
 
   return {
-    queueStats: queueStatsQuery.data || [],
+    queueStats: Array.isArray(queueStatsQuery.data) ? queueStatsQuery.data : [],
     isQueueLoading: queueStatsQuery.isLoading,
     refetchQueues: queueStatsQuery.refetch,
-    workerStats: workerStatsQuery.data || [],
+    workerStats: Array.isArray(workerStatsQuery.data) ? workerStatsQuery.data : [],
     isWorkerLoading: workerStatsQuery.isLoading,
   };
 }

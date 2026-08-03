@@ -32,7 +32,7 @@ export function DashboardPage() {
     queryFn: () => queuesApi.getStats(),
     refetchInterval: 10_000,
   });
-  const queueStats = queueStatsResponse?.data || [];
+  const queueStats = Array.isArray(queueStatsResponse?.data) ? queueStatsResponse.data : [];
 
   const stats = data?.stats || {
     totalTasks: 0,

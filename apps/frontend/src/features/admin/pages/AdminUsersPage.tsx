@@ -30,7 +30,7 @@ export const AdminUsersPage: React.FC = () => {
       }),
   });
 
-  const users = usersResponse?.data?.data || [];
+  const users = Array.isArray(usersResponse?.data?.data) ? usersResponse.data.data : [];
   const meta = usersResponse?.data?.meta || { page: 1, limit: 10, total: 0, totalPages: 1 };
 
   // Update User Mutation
@@ -350,3 +350,5 @@ export const AdminUsersPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminUsersPage;

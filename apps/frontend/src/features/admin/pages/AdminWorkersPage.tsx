@@ -129,7 +129,7 @@ export const AdminWorkersPage: React.FC = () => {
             <RefreshCw className="w-4 h-4 text-blue-500" />
           </div>
           <div className="text-2xl font-bold text-foreground">
-            {(stats?.queues || []).reduce((acc, q) => acc + q.active + q.waiting + q.completed, 0)}
+            {(Array.isArray(stats?.queues) ? stats.queues : []).reduce((acc, q) => acc + (q?.active || 0) + (q?.waiting || 0) + (q?.completed || 0), 0)}
           </div>
           <p className="text-xs text-muted-foreground">Across all job queues</p>
         </div>
@@ -244,3 +244,5 @@ export const AdminWorkersPage: React.FC = () => {
     </div>
   );
 };
+
+export default AdminWorkersPage;

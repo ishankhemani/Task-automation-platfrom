@@ -27,8 +27,12 @@ interface TaskBuilderModalProps {
   onClose: () => void;
 }
 
+import { useAuth } from '../../../hooks/useAuth.js';
+import { UserRole } from '@task-platform/shared';
+
 export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
   const { createTask, isCreating } = useTaskMutations();
+  const { role } = useAuth();
 
   const {
     register,
@@ -50,13 +54,19 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
 
   const onSubmit = async (data: CreateTaskFormType) => {
     try {
+      const rawAttachment = data.attachment?.trim();
+      const validAttachment =
+        rawAttachment && rawAttachment !== '' && rawAttachment !== 'null' && rawAttachment !== 'undefined'
+          ? rawAttachment
+          : undefined;
+
       await createTask({
         title: data.title,
-        description: data.description || undefined,
+        description: data.description?.trim() || undefined,
         priority: data.priority as Priority,
         scheduledTime: data.scheduledTime || undefined,
-        attachment: data.attachment || undefined,
-        assignedTo: data.assignedTo || undefined,
+        attachment: validAttachment,
+        assignedTo: data.assignedTo?.trim() || undefined,
       });
       reset();
       onClose();
@@ -107,9 +117,11 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
               <Input {...register('scheduledTime')} type="datetime-local" className="text-xs min-h-[40px] sm:min-h-[38px]" />
             </FormFieldWrapper>
 
-            <FormFieldWrapper label="Assign To (User ID)" error={errors.assignedTo?.message}>
-              <Input {...register('assignedTo')} placeholder="Optional: paste user UUID to assign task" className="text-xs min-h-[38px]" />
-            </FormFieldWrapper>
+            {role === UserRole.ADMIN && (
+              <FormFieldWrapper label="Assign To (User ID)" error={errors.assignedTo?.message}>
+                <Input {...register('assignedTo')} placeholder="Optional: paste user UUID to assign task" className="text-xs min-h-[38px]" />
+              </FormFieldWrapper>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -118,6 +130,9 @@ export function TaskBuilderModal({ isOpen, onClose }: TaskBuilderModalProps) {
               allowedTypes={['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']}
               onUploadSuccess={(url) => {
                 setValue('attachment', url);
+              }}
+              onClear={() => {
+                setValue('attachment', '');
               }}
               acceptText="Upload PDF or Image attachment for task context"
             />

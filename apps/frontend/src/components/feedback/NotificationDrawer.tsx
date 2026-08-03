@@ -29,8 +29,8 @@ export function NotificationDrawer() {
     refetchInterval: isOpen ? 15000 : false,
   });
 
-  const notifications: Notification[] = (data?.data as Notification[]) || [];
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const notifications: Notification[] = Array.isArray(data?.data) ? (data.data as Notification[]) : [];
+  const unreadCount = notifications.filter((n) => !n?.isRead).length;
 
   const markAsReadMutation = useMutation({
     mutationFn: (id: string) => notificationsApi.markAsRead(id),

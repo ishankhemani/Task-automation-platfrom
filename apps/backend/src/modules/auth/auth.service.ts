@@ -22,11 +22,14 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(dto.password, AUTH_CONSTANTS.SALT_ROUNDS);
 
+    // Public registration strictly creates standard USER accounts (Admin accounts are fixed/seeded)
+    const userRole = dto.role === Role.ADMIN ? Role.USER : ((dto.role as Role) || Role.USER);
+
     const user = await AuthRepository.createUser({
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
-      role: (dto.role as Role) || Role.USER,
+      role: userRole,
     });
 
     logger.info({ userId: user.id, email: user.email }, 'User registered successfully');

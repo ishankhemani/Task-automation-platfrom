@@ -22,7 +22,10 @@ export const uploadsApi = {
 
     return axiosClient.post<unknown, ApiResponse<UploadResult>>('/uploads', formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        // Let the browser set Content-Type automatically so it includes
+        // the correct multipart/form-data boundary that multer needs.
+        // If we leave the axios default 'application/json' it causes a 400.
+        'Content-Type': undefined,
       },
       onUploadProgress: (progressEvent) => {
         if (progressEvent.total && onProgress) {

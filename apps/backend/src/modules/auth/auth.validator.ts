@@ -3,8 +3,8 @@ import { AUTH_CONSTANTS } from './auth.constants.js';
 
 export const registerSchema = z.object({
   body: z.object({
-    name: z.string().min(2, 'Name must be at least 2 characters').max(AUTH_CONSTANTS.MAX_NAME_LENGTH),
-    email: z.string().email('Invalid email address'),
+    name: z.string().trim().min(2, 'Name must be at least 2 characters').max(AUTH_CONSTANTS.MAX_NAME_LENGTH),
+    email: z.string().trim().toLowerCase().email('Invalid email address'),
     password: z.string().min(AUTH_CONSTANTS.MIN_PASSWORD_LENGTH, `Password must be at least ${AUTH_CONSTANTS.MIN_PASSWORD_LENGTH} characters`),
     role: z.enum(['ADMIN', 'USER', 'VIEWER']).optional(),
   }),
@@ -12,21 +12,31 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email address'),
+    email: z.string().trim().toLowerCase().email('Invalid email address'),
     password: z.string().min(1, 'Password is required'),
+    rememberMe: z.boolean().optional(),
   }),
 });
 
 export const refreshTokenSchema = z.object({
   body: z.object({
-    refreshToken: z.string().min(1, 'Refresh token is required'),
-  }),
+    refreshToken: z.string().optional(),
+  }).optional(),
+  cookies: z.object({
+    refreshToken: z.string().optional(),
+  }).optional(),
+}).refine(data => data?.body?.refreshToken || data?.cookies?.refreshToken, {
+  message: 'Refresh token is required',
+  path: ['body', 'refreshToken'],
 });
 
 export const logoutSchema = z.object({
   body: z.object({
-    refreshToken: z.string().min(1, 'Refresh token is required'),
-  }),
+    refreshToken: z.string().optional(),
+  }).optional(),
+  cookies: z.object({
+    refreshToken: z.string().optional(),
+  }).optional(),
 });
 
 export const forgotPasswordSchema = z.object({

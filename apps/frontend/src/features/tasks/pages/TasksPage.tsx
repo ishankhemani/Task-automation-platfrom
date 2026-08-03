@@ -24,7 +24,7 @@ export function TasksPage() {
   const { data: response, isLoading } = useTasks(filters);
   const { cancelTask, retryTask, duplicateTask, deleteTask } = useTaskMutations();
 
-  const tasks = response?.data || [];
+  const tasks: TaskItem[] = response ?? [];
 
   const columns = [
     {

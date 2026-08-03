@@ -100,19 +100,49 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
                 <span className="text-xs text-muted-foreground block">Updated At</span>
                 <span className="font-semibold text-xs sm:text-sm">{new Date(task.updatedAt).toLocaleString()}</span>
               </div>
-              {task.attachment && (
-                <div>
-                  <span className="text-xs text-muted-foreground block">Attachment</span>
-                  <a
-                    href={task.attachment}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary font-medium hover:underline flex items-center gap-1 text-xs sm:text-sm truncate"
-                  >
-                    <Paperclip className="w-3.5 h-3.5 shrink-0" /> File Link
-                  </a>
-                </div>
-              )}
+              {Boolean(
+                task.attachment &&
+                  task.attachment.trim() !== '' &&
+                  task.attachment !== 'null' &&
+                  task.attachment !== 'undefined'
+              ) && (() => {
+                // Resolve the attachment URL:
+                // - If it already starts with http(s), use as-is (external link)
+                // - If it starts with /uploads/, keep as-is (will be proxied by Vite)
+                // - Otherwise prefix with /uploads/
+                const raw = task.attachment!.trim();
+                const attachmentUrl = /^https?:\/\//i.test(raw)
+                  ? raw
+                  : raw.startsWith('/uploads/')
+                    ? raw
+                    : raw.startsWith('/')
+                      ? raw
+                      : `/uploads/${raw}`;
+                const isImg = /\.(jpe?g|png|gif|webp|bmp|avif|svg)$/i.test(raw);
+                return (
+                  <div className="col-span-full">
+                    <span className="text-xs text-muted-foreground block mb-1">Attachment File</span>
+                    {isImg && (
+                      <div className="mb-2 rounded-lg overflow-hidden border border-border max-w-xs">
+                        <img
+                          src={attachmentUrl}
+                          alt="Attachment preview"
+                          className="w-full h-auto max-h-48 object-contain bg-muted"
+                        />
+                      </div>
+                    )}
+                    <a
+                      href={attachmentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary font-semibold hover:underline flex items-center gap-1.5 text-xs sm:text-sm truncate"
+                    >
+                      <Paperclip className="w-3.5 h-3.5 shrink-0 text-primary" />
+                      {raw.split('/').pop() || 'View Attachment'}
+                    </a>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Actions Toolbar */}

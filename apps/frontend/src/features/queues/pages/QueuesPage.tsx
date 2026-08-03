@@ -12,10 +12,12 @@ import { IQueueStats } from '@task-platform/shared';
 export function QueuesPage() {
   const { queueStats, isQueueLoading, refetchQueues, workerStats, isWorkerLoading } = useQueueQueries();
 
-  const totalWaiting = queueStats.reduce((acc, q) => acc + q.waiting, 0);
-  const totalActive = queueStats.reduce((acc, q) => acc + q.active, 0);
-  const totalCompleted = queueStats.reduce((acc, q) => acc + q.completed, 0);
-  const totalFailed = queueStats.reduce((acc, q) => acc + q.failed, 0);
+  const safeQueueStats = Array.isArray(queueStats) ? queueStats : [];
+
+  const totalWaiting = safeQueueStats.reduce((acc, q) => acc + (q?.waiting || 0), 0);
+  const totalActive = safeQueueStats.reduce((acc, q) => acc + (q?.active || 0), 0);
+  const totalCompleted = safeQueueStats.reduce((acc, q) => acc + (q?.completed || 0), 0);
+  const totalFailed = safeQueueStats.reduce((acc, q) => acc + (q?.failed || 0), 0);
 
   const queueColumns = [
     { header: 'Queue Name', accessorKey: 'queueName' as const },

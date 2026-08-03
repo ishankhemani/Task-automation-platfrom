@@ -9,23 +9,23 @@ import { ROUTES } from '../config/constants.js';
 import { UserRole } from '@task-platform/shared';
 
 // Lazy-loaded page components for code-splitting
-const LoginPage = lazy(() => import('../features/auth/pages/LoginPage.js').then(m => ({ default: m.LoginPage })));
-const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage.js').then(m => ({ default: m.RegisterPage })));
-const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage.js').then(m => ({ default: m.ForgotPasswordPage })));
-const ResetPasswordPage = lazy(() => import('../features/auth/pages/ResetPasswordPage.js').then(m => ({ default: m.ResetPasswordPage })));
-const UnauthorizedPage = lazy(() => import('../features/auth/pages/UnauthorizedPage.js').then(m => ({ default: m.UnauthorizedPage })));
-const SessionExpiredPage = lazy(() => import('../features/auth/pages/SessionExpiredPage.js').then(m => ({ default: m.SessionExpiredPage })));
+const LoginPage = lazy(() => import('../features/auth/pages/LoginPage.js').then(m => ({ default: m.LoginPage || m.default })));
+const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage.js').then(m => ({ default: m.RegisterPage || m.default })));
+const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage.js').then(m => ({ default: m.ForgotPasswordPage || m.default })));
+const ResetPasswordPage = lazy(() => import('../features/auth/pages/ResetPasswordPage.js').then(m => ({ default: m.ResetPasswordPage || m.default })));
+const UnauthorizedPage = lazy(() => import('../features/auth/pages/UnauthorizedPage.js').then(m => ({ default: m.UnauthorizedPage || m.default })));
+const SessionExpiredPage = lazy(() => import('../features/auth/pages/SessionExpiredPage.js').then(m => ({ default: m.SessionExpiredPage || m.default })));
 
-const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage.js').then(m => ({ default: m.DashboardPage })));
-const TasksPage = lazy(() => import('../features/tasks/pages/TasksPage.js').then(m => ({ default: m.TasksPage })));
-const AnalyticsPage = lazy(() => import('../features/analytics/pages/AnalyticsPage.js').then(m => ({ default: m.AnalyticsPage })));
-const QueuesPage = lazy(() => import('../features/queues/pages/QueuesPage.js').then(m => ({ default: m.QueuesPage })));
-const ProfilePage = lazy(() => import('../features/profile/pages/ProfilePage.js').then(m => ({ default: m.ProfilePage })));
-const SettingsPage = lazy(() => import('../features/settings/pages/SettingsPage.js').then(m => ({ default: m.SettingsPage })));
+const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage.js').then(m => ({ default: m.DashboardPage || m.default })));
+const TasksPage = lazy(() => import('../features/tasks/pages/TasksPage.js').then(m => ({ default: m.TasksPage || m.default })));
+const AnalyticsPage = lazy(() => import('../features/analytics/pages/AnalyticsPage.js').then(m => ({ default: m.AnalyticsPage || m.default })));
+const QueuesPage = lazy(() => import('../features/queues/pages/QueuesPage.js').then(m => ({ default: m.QueuesPage || m.default })));
+const ProfilePage = lazy(() => import('../features/profile/pages/ProfilePage.js').then(m => ({ default: m.ProfilePage || m.default })));
+const SettingsPage = lazy(() => import('../features/settings/pages/SettingsPage.js').then(m => ({ default: m.SettingsPage || m.default })));
 
-const AdminUsersPage = lazy(() => import('../features/admin/pages/AdminUsersPage.js').then(m => ({ default: m.AdminUsersPage })));
-const AdminWorkersPage = lazy(() => import('../features/admin/pages/AdminWorkersPage.js').then(m => ({ default: m.AdminWorkersPage })));
-const AdminLogsPage = lazy(() => import('../features/admin/pages/AdminLogsPage.js').then(m => ({ default: m.AdminLogsPage })));
+const AdminUsersPage = lazy(() => import('../features/admin/pages/AdminUsersPage.js').then(m => ({ default: m.AdminUsersPage || m.default })));
+const AdminWorkersPage = lazy(() => import('../features/admin/pages/AdminWorkersPage.js').then(m => ({ default: m.AdminWorkersPage || m.default })));
+const AdminLogsPage = lazy(() => import('../features/admin/pages/AdminLogsPage.js').then(m => ({ default: m.AdminLogsPage || m.default })));
 
 // Suspense fallback spinner
 function PageLoader() {

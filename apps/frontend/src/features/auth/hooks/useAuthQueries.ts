@@ -22,7 +22,10 @@ export function useAuthQueries() {
     mutationFn: (data: LoginInput) => authApi.login(data),
     onSuccess: (response) => {
       if (response.success && response.data) {
-        const { user, accessToken } = response.data;
+        const { user, accessToken, refreshToken } = response.data;
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+        }
         setAuthCredentials(user, accessToken);
         showSuccess('Welcome back!', `Logged in as ${user.name}`);
         navigate(ROUTES.DASHBOARD, { replace: true });
@@ -92,8 +95,9 @@ export function useAuthQueries() {
 
   // Logout Mutation
   const logoutMutation = useMutation({
-    mutationFn: () => authApi.logout(accessToken || ''),
+    mutationFn: () => authApi.logout(localStorage.getItem('refreshToken') || accessToken || ''),
     onSettled: () => {
+      localStorage.removeItem('refreshToken');
       clearAuthCredentials();
       queryClient.clear();
       showSuccess('Logged out successfully');

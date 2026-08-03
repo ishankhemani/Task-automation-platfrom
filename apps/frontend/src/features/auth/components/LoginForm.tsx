@@ -11,7 +11,7 @@ import { useAuthQueries } from '../hooks/useAuthQueries.js';
 import { ROUTES } from '../../../config/constants.js';
 
 const loginValidationSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.string().trim().toLowerCase().email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().optional(),
 });
@@ -39,6 +39,7 @@ export function LoginForm() {
   const handleQuickLogin = (email: string, pass: string) => {
     setValue('email', email);
     setValue('password', pass);
+    login({ email, password: pass });
   };
 
   const onSubmit = async (data: LoginSchemaType) => {
@@ -51,26 +52,28 @@ export function LoginForm() {
 
   return (
     <div className="space-y-4">
-      {/* Quick Demo Role Selector */}
+      {/* Preset Quick Login Buttons */}
       <div className="p-3 rounded-xl border border-primary/20 bg-primary/5 space-y-2">
-        <div className="flex items-center justify-between text-xs font-semibold text-foreground">
-          <span>Quick Demo Role Sign-In:</span>
-          <span className="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20">Preset Credentials</span>
-        </div>
+        <p className="text-xs font-semibold text-foreground flex items-center justify-between">
+          <span>⚡ Preset System Credentials</span>
+          <span className="text-[10px] text-muted-foreground">Click to log in</span>
+        </p>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => handleQuickLogin('admin@taskplatform.com', 'Admin123!')}
-            className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-primary/30 bg-card hover:bg-primary/10 text-foreground transition-all flex items-center justify-center gap-1 min-h-[36px]"
+            className="px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-semibold text-left transition-colors flex flex-col"
           >
-            🛡️ Admin Role
+            <span>👑 Preset Admin</span>
+            <span className="text-[10px] font-normal opacity-80 truncate">admin@taskplatform.com</span>
           </button>
           <button
             type="button"
             onClick={() => handleQuickLogin('user@taskplatform.com', 'User123!')}
-            className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-border bg-card hover:bg-muted text-foreground transition-all flex items-center justify-center gap-1 min-h-[36px]"
+            className="px-2.5 py-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-semibold text-left transition-colors flex flex-col"
           >
-            👤 Standard User
+            <span>👤 Standard User</span>
+            <span className="text-[10px] font-normal opacity-80 truncate">user@taskplatform.com</span>
           </button>
         </div>
       </div>

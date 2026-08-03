@@ -19,6 +19,11 @@ export function errorHandler(
     return;
   }
 
+  if (err.name === 'MulterError') {
+    sendError(res, `Upload error: ${err.message}`, 400);
+    return;
+  }
+
   // Unhandled error
   logger.error(err, 'Unhandled error');
   sendError(res, 'Internal Server Error', 500, err.message);

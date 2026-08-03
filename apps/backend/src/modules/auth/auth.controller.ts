@@ -48,6 +48,14 @@ export class AuthController {
    */
   static async login(req: Request, res: Response): Promise<void> {
     const result = await AuthService.login(req.body, req.ip, req.get('user-agent'));
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     sendSuccess(res, result, AUTH_MESSAGES.LOGIN_SUCCESS);
   }
 
@@ -70,8 +78,16 @@ export class AuthController {
    *         description: Invalid refresh token
    */
   static async refreshToken(req: Request, res: Response): Promise<void> {
-    const { refreshToken } = req.body;
-    const tokens = await AuthService.refreshToken(refreshToken);
+    const token = req.body?.refreshToken || req.cookies?.refreshToken;
+    const tokens = await AuthService.refreshToken(token);
+
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     sendSuccess(res, tokens, AUTH_MESSAGES.TOKEN_REFRESHED);
   }
 
@@ -97,9 +113,11 @@ export class AuthController {
    *         description: Logged out successfully
    */
   static async logout(req: Request, res: Response): Promise<void> {
-    const { refreshToken } = req.body;
+    const token = req.body?.refreshToken || req.cookies?.refreshToken;
     const user = (req as AuthenticatedRequest).user;
-    await AuthService.logout(refreshToken, user?.id, req.ip, req.get('user-agent'));
+    await AuthService.logout(token, user?.id, req.ip, req.get('user-agent'));
+
+    res.clearCookie('refreshToken');
     sendSuccess(res, null, AUTH_MESSAGES.LOGOUT_SUCCESS);
   }
 
